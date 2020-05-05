@@ -1,24 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState, useRef } from "react";
+import Canvas from "./components/Canvas";
+import SocketIO from "socket.io-client";
 
 function App() {
+  const [room, setRoom] = useState("");
+  const socketRef = useRef(null);
+  const [drawOperation, setDrawOperation] = useState(null);
+
+  useEffect(() => {
+    socketRef.current = SocketIO("http://localhost:8080");
+
+    function handleDrawOperation(drawOperation) {
+      setDrawOperation(drawOperation);
+    }
+
+    socketRef.current.on("draw operation", handleDrawOperation);
+
+    return () => {
+      socketRef.current.off(handleDrawOperation);
+    };
+  }, []);
+
+  function handleCanvasChange(drawOperation) {
+    socketRef.current.emit("draw operation", drawOperation);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <label>
+        Room
+        <input value={room} onChange={(event) => setRoom(event.target.value)} />
+      </label>
+      <Canvas onChange={handleCanvasChange} drawOperation={drawOperation} />
     </div>
   );
 }
