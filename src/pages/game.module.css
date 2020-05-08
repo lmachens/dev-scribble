@@ -1,3 +1,7 @@
 .main {
   margin: 20px;
 }
+
+.players > span {
+  margin-right: 6px;
+}

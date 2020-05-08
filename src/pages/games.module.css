@@ -1,0 +1,35 @@
+.main {
+  margin: 40px 20px;
+  text-align: center;
+}
+
+.joinGameLabel {
+  text-decoration: none;
+  color: lightblue;
+}
+
+.openGame {
+  display: inline-block;
+  cursor: pointer;
+  margin-top: 24px;
+  color: #ddd;
+  background: none;
+  border: 1px solid #2f363d;
+  padding: 10px 14px;
+  font-size: 1.2rem;
+  transition: 0.5s;
+  text-decoration: none;
+}
+
+.openGame:hover {
+  color: #ddd;
+  background: #2f363d;
+}
+
+.game {
+  margin: 10px;
+}
+
+.game span {
+  margin-right: 6px;
+}

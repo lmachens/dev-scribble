@@ -3,7 +3,7 @@ import { useState } from "react";
 function getSessionStorageItem(key, defaultValue) {
   try {
     const item = sessionStorage.getItem(key);
-    if (item === undefined) {
+    if (item === null || item === undefined) {
       return defaultValue;
     }
     return JSON.parse(item);

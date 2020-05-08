@@ -17,3 +17,8 @@ body {
   background: black;
   color: #ddd;
 }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

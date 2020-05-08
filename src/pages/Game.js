@@ -3,16 +3,24 @@ import GameStyles from "./game.module.css";
 import Canvas from "../components/Canvas";
 import SocketIO from "socket.io-client";
 import { useParams } from "react-router-dom";
+import { usePlayerName } from "../contexts/playerName";
+import SelectPlayerName from "../components/SelectPlayerName";
+import PlayerName from "../components/PlayerName";
 
 const Game = () => {
   const { gameId } = useParams();
   const socketRef = useRef(null);
   const [drawOperation, setDrawOperation] = useState(null);
   const [game, setGame] = useState(null);
+  const [playerName] = usePlayerName();
 
   useEffect(() => {
+    if (!playerName) {
+      return;
+    }
+
     socketRef.current = SocketIO("http://localhost:8080");
-    socketRef.current.emit("join game", gameId);
+    socketRef.current.emit("join game", { gameId, playerName });
 
     function handleDrawOperation(drawOperation) {
       setDrawOperation(drawOperation);
@@ -30,7 +38,11 @@ const Game = () => {
       socketRef.current.off(handleRefreshGame);
       socketRef.current.emit("leave game", gameId);
     };
-  }, [gameId]);
+  }, [playerName, gameId]);
+
+  if (!playerName) {
+    return <SelectPlayerName />;
+  }
 
   function handleCanvasChange(drawOperation) {
     socketRef.current.emit("draw operation", {
@@ -44,10 +56,10 @@ const Game = () => {
 
   return (
     <main className={GameStyles.main}>
-      <div>Players: {game.players.length ?? 0}</div>
-      <div>
+      <div>{game.players.length ?? 0} Players</div>
+      <div className={GameStyles.players}>
         {game.players.map((player) => (
-          <div key={player}>{player}</div>
+          <PlayerName key={player.id}>{player.name}</PlayerName>
         ))}
       </div>
       <Canvas
