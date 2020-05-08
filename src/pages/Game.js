@@ -26,6 +26,8 @@ const Game = () => {
   const [drawOperation, setDrawOperation] = useState(null);
   const [game, setGame] = useState(null);
   const [playerName] = usePlayerName();
+  const [secret, setSecret] = useState("");
+  const [guess, setGuess] = useState("");
 
   useEffect(() => {
     if (!playerName) {
@@ -41,14 +43,21 @@ const Game = () => {
 
     function handleRefreshGame(game) {
       setGame(game);
+      setSecret("");
+    }
+
+    function handleGetSecret(secret) {
+      setSecret(secret);
     }
 
     socketRef.current.on("draw operation", handleDrawOperation);
     socketRef.current.on("refresh game", handleRefreshGame);
+    socketRef.current.on("get secret", handleGetSecret);
 
     return () => {
       socketRef.current.off(handleDrawOperation);
       socketRef.current.off(handleRefreshGame);
+      socketRef.current.off(handleGetSecret);
       socketRef.current.emit("leave game", gameId);
     };
   }, [playerName, gameId]);
@@ -68,6 +77,23 @@ const Game = () => {
     socketRef.current.emit("start game", gameId);
   }
 
+  function handleGuessChange(event) {
+    const newGuess = event.target.value.trim();
+    if (newGuess.length > game.nextSecretLength) {
+      return;
+    }
+    setGuess(newGuess);
+  }
+
+  function handleSubmitGuess(event) {
+    event.preventDefault();
+    socketRef.current.emit("guess word", {
+      guess,
+      gameId,
+    });
+    setGuess("");
+  }
+
   if (!game) {
     return <div>Connecting...</div>;
   }
@@ -84,7 +110,25 @@ const Game = () => {
       <div className={GameStyles.status}>
         {game.isRunning ? (
           <span>
-            <PlayerName>{game.nextPlayer.name}</PlayerName> is drawing!
+            {game.nextPlayer.id === playerId ? (
+              secret
+            ) : (
+              <form onSubmit={handleSubmitGuess}>
+                <input
+                  autoFocus
+                  className={GameStyles.guess}
+                  value={guess}
+                  onChange={handleGuessChange}
+                />
+                {Array(game.nextSecretLength)
+                  .fill(null)
+                  .map((_, index) => (
+                    <span key={index} className={GameStyles.char}>
+                      {guess[index] || "_"}
+                    </span>
+                  ))}
+              </form>
+            )}
           </span>
         ) : (
           <span>

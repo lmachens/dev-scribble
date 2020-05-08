@@ -1,6 +1,7 @@
 const app = require("express")();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
+const { secrets } = require("./secrets");
 
 const PORT = 8080;
 
@@ -22,6 +23,8 @@ function createGame(gameId, playerId, playerName) {
     drawOperations: [],
     isRunning: false,
     nextPlayer: null,
+    nextSecret: null,
+    nextSecretLength: 0,
   };
   broadcaseListGamesUpdate();
 }
@@ -44,8 +47,20 @@ function gameExists(gameId) {
   return Boolean(games[gameId]);
 }
 
+function getGame(gameId) {
+  return games[gameId];
+}
+
+function getGameWithoutSecret(gameId) {
+  if (!games[gameId]) {
+    return;
+  }
+  const { nextSecret, ...game } = games[gameId];
+  return game;
+}
+
 function broadcastGameUpdate(gameId) {
-  io.to(gameId).emit("refresh game", games[gameId]);
+  io.to(gameId).emit("refresh game", getGameWithoutSecret(gameId));
 }
 
 function broadcaseListGamesUpdate() {
@@ -107,56 +122,76 @@ function removePlayer(playerId) {
   delete players[playerId];
 }
 
+function newRound(gameId) {
+  const game = getGame(gameId);
+  game.nextPlayer =
+    game.players[Math.floor(Math.random() * game.players.length)];
+  game.drawOperations = [];
+  game.nextSecret = secrets[Math.floor(Math.random() * secrets.length)];
+  game.nextSecretLength = game.nextSecret.length;
+
+  io.to(game.nextPlayer.id).emit("get secret", game.nextSecret);
+
+  broadcaseListGamesUpdate();
+  broadcastGameUpdate(gameId);
+}
+
 function startGame(gameId, playerId) {
   const game = games[gameId];
   if (!game || game.owner.id !== playerId) {
     return;
   }
   game.isRunning = true;
-  game.nextPlayer =
-    game.players[Math.floor(Math.random() * game.players.length)];
-  game.drawOperations = [];
-
-  broadcaseListGamesUpdate();
-  broadcastGameUpdate(gameId);
+  newRound(gameId);
 }
 
 io.on("connection", (socket) => {
-  const playerId = socket.conn.id;
-  initializePlayer(playerId);
+  try {
+    const playerId = socket.conn.id;
+    initializePlayer(playerId);
 
-  socket.on("list games", () => {
-    socket.emit("list games", getGames());
-  });
+    socket.on("list games", () => {
+      socket.emit("list games", getGames());
+    });
 
-  socket.on("join game", ({ gameId, playerName }) => {
-    if (!gameExists(gameId)) {
-      createGame(gameId, playerId, playerName);
-    }
-    socket.join(gameId);
-    joinGame(gameId, playerId, playerName);
-  });
+    socket.on("join game", ({ gameId, playerName }) => {
+      if (!gameExists(gameId)) {
+        createGame(gameId, playerId, playerName);
+      }
+      socket.join(gameId);
+      joinGame(gameId, playerId, playerName);
+    });
 
-  socket.on("leave game", (gameId) => {
-    socket.leave(gameId);
-    leaveGame(gameId, playerId);
-  });
-
-  socket.on("start game", (gameId) => {
-    startGame(gameId, playerId);
-  });
-
-  socket.on("draw operation", ({ gameId, ...drawOperation }) => {
-    addDrawOperation(gameId, drawOperation);
-  });
-
-  socket.on("disconnect", () => {
-    const { gameId } = getPlayer(playerId);
-    if (gameId) {
+    socket.on("leave game", (gameId) => {
+      socket.leave(gameId);
       leaveGame(gameId, playerId);
-    }
-    removePlayer(playerId);
-  });
+    });
+
+    socket.on("start game", (gameId) => {
+      startGame(gameId, playerId);
+    });
+
+    socket.on("draw operation", ({ gameId, ...drawOperation }) => {
+      addDrawOperation(gameId, drawOperation);
+    });
+
+    socket.on("guess word", ({ gameId, guess }) => {
+      const game = getGame(gameId);
+      if (game.nextSecret.toLowerCase() === guess.toLowerCase()) {
+        newRound(gameId);
+      }
+    });
+
+    socket.on("disconnect", () => {
+      const { gameId } = getPlayer(playerId);
+      if (gameId) {
+        leaveGame(gameId, playerId);
+      }
+      removePlayer(playerId);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 http.listen(PORT, () => {

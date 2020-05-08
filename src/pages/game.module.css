@@ -14,3 +14,12 @@
 .status {
   margin-bottom: 10px;
 }
+
+.char {
+  margin: 2px;
+}
+
+.guess {
+  opacity: 0;
+  position: absolute;
+}
