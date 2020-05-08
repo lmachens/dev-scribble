@@ -11,10 +11,13 @@ const PORT = 8080;
 const games = {};
 const players = {};
 
-function createGame(gameId, playerId) {
+function createGame(gameId, playerId, playerName) {
   games[gameId] = {
     gameId,
-    ownerId: playerId,
+    owner: {
+      id: playerId,
+      name: playerName,
+    },
     players: [],
     drawOperations: [],
     isRunning: false,
@@ -24,9 +27,15 @@ function createGame(gameId, playerId) {
 }
 
 function leaveGame(gameId, playerId) {
-  games[gameId].players = games[gameId].players.filter(
-    (player) => player.id !== playerId
-  );
+  const game = games[gameId];
+  game.players = game.players.filter((player) => player.id !== playerId);
+
+  if (gameIsEmpty(gameId)) {
+    removeGame(gameId);
+  } else if (game.owner.id === playerId) {
+    game.owner = game.players[0];
+  }
+
   broadcastGameUpdate(gameId);
   broadcaseListGamesUpdate();
 }
@@ -99,10 +108,15 @@ function removePlayer(playerId) {
 }
 
 function startGame(gameId, playerId) {
-  if (games[gameId] && games[gameId].ownerId !== playerId) {
+  const game = games[gameId];
+  if (!game || game.owner.id !== playerId) {
     return;
   }
-  games[gameId].isRunning = true;
+  game.isRunning = true;
+  game.nextPlayer =
+    game.players[Math.floor(Math.random() * game.players.length)];
+  game.drawOperations = [];
+
   broadcaseListGamesUpdate();
   broadcastGameUpdate(gameId);
 }
@@ -117,7 +131,7 @@ io.on("connection", (socket) => {
 
   socket.on("join game", ({ gameId, playerName }) => {
     if (!gameExists(gameId)) {
-      createGame(gameId, playerId);
+      createGame(gameId, playerId, playerName);
     }
     socket.join(gameId);
     joinGame(gameId, playerId, playerName);
@@ -126,9 +140,6 @@ io.on("connection", (socket) => {
   socket.on("leave game", (gameId) => {
     socket.leave(gameId);
     leaveGame(gameId, playerId);
-    if (gameIsEmpty(gameId)) {
-      removeGame(gameId);
-    }
   });
 
   socket.on("start game", (gameId) => {

@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./canvas.css";
 
-const colors = ["orange", "green", "red"];
-const color = colors[Math.floor(Math.random() * colors.length)];
-
 function calcDrawPosition(event, canvas) {
   return [
     ((event.clientX - canvas.offsetLeft) * canvas.width) / canvas.offsetWidth,
@@ -11,14 +8,26 @@ function calcDrawPosition(event, canvas) {
   ];
 }
 
-function Canvas({ onChange, drawOperation, oldDrawOperations }) {
+function Canvas({
+  onChange,
+  drawOperation,
+  oldDrawOperations,
+  color,
+  disabled,
+  nextPlayer,
+}) {
   const canvasRef = useRef();
   const [previous, setPrevious] = useState(null);
   const [current, setCurrent] = useState(null);
   const [drawing, setDrawing] = useState(false);
 
   useEffect(() => {
-    if (!drawing) {
+    const ctx = canvasRef.current.getContext("2d");
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+  }, [nextPlayer]);
+
+  useEffect(() => {
+    if (!drawing || disabled) {
       return;
     }
 
@@ -31,7 +40,7 @@ function Canvas({ onChange, drawOperation, oldDrawOperations }) {
     ctx.stroke();
     ctx.closePath();
     onChange({ previous, current, color });
-  }, [onChange, drawing, previous, current]);
+  }, [onChange, drawing, previous, current, color, disabled]);
 
   useEffect(() => {
     if (oldDrawOperations.length === 0) {

@@ -1,5 +1,6 @@
 .main {
   margin: 20px;
+  text-align: center;
 }
 
 .players {
@@ -8,4 +9,8 @@
 
 .players > span {
   margin-right: 6px;
+}
+
+.status {
+  margin-bottom: 10px;
 }
