@@ -1,13 +1,11 @@
-const app = require("express")();
+const express = require("express");
+const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 const { secrets } = require("./secrets");
+const path = require("path");
 
 const PORT = 8080;
-
-// app.get('/', (req, res) => {
-//   res.sendFile(__dirname + '/index.html');
-// });
 
 const games = {};
 const players = {};
@@ -192,6 +190,12 @@ io.on("connection", (socket) => {
   } catch (error) {
     console.error(error);
   }
+});
+
+app.use(express.static(path.join(__dirname, "build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 http.listen(PORT, () => {
