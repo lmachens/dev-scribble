@@ -1,7 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
+import "./canvas.css";
 
 const colors = ["orange", "green", "red"];
 const color = colors[Math.floor(Math.random() * colors.length)];
+
+function calcDrawPosition(event, canvas) {
+  return [
+    ((event.clientX - canvas.offsetLeft) * canvas.width) / canvas.offsetWidth,
+    ((event.clientY - canvas.offsetTop) * canvas.height) / canvas.offsetHeight,
+  ];
+}
+
 function Canvas({ onChange, drawOperation, oldDrawOperations }) {
   const canvasRef = useRef();
   const [previous, setPrevious] = useState(null);
@@ -51,10 +60,7 @@ function Canvas({ onChange, drawOperation, oldDrawOperations }) {
   }
 
   function handleMouseDown(event) {
-    setCurrent([
-      event.clientX - canvasRef.current.offsetLeft,
-      event.clientY - canvasRef.current.offsetTop,
-    ]);
+    setCurrent(calcDrawPosition(event, canvasRef.current));
     setDrawing(true);
   }
 
@@ -65,17 +71,14 @@ function Canvas({ onChange, drawOperation, oldDrawOperations }) {
 
   function handleMouseMove(event) {
     setPrevious(current);
-    setCurrent([
-      event.clientX - canvasRef.current.offsetLeft,
-      event.clientY - canvasRef.current.offsetTop,
-    ]);
+    setCurrent(calcDrawPosition(event, canvasRef.current));
   }
 
   return (
     <canvas
       ref={canvasRef}
-      width="400"
-      height="300"
+      width="800"
+      height="600"
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}

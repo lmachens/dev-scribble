@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import GameStyles from "./game.module.css";
 import Canvas from "../components/Canvas";
 import SocketIO from "socket.io-client";
 import { useParams } from "react-router-dom";
@@ -42,11 +43,11 @@ const Game = () => {
   }
 
   return (
-    <div>
+    <main className={GameStyles.main}>
       <div>Players: {game.players.length ?? 0}</div>
       <div>
         {game.players.map((player) => (
-          <span>{player}</span>
+          <div key={player}>{player}</div>
         ))}
       </div>
       <Canvas
@@ -54,7 +55,7 @@ const Game = () => {
         oldDrawOperations={game.drawOperations}
         drawOperation={drawOperation}
       />
-    </div>
+    </main>
   );
 };
 
