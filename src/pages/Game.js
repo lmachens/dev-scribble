@@ -50,6 +50,11 @@ const Game = () => {
       gameId,
     });
   }
+
+  function handleStartGameClick() {
+    socketRef.current.emit("start game", gameId);
+  }
+
   if (!game) {
     return <div>Connecting...</div>;
   }
@@ -67,6 +72,16 @@ const Game = () => {
         oldDrawOperations={game.drawOperations}
         drawOperation={drawOperation}
       />
+      <div>
+        {game.ownerId === socketRef.current.id && (
+          <button onClick={handleStartGameClick} disabled={game.isRunning}>
+            Start game
+          </button>
+        )}
+        <a className="button" href="/games">
+          Exit game
+        </a>
+      </div>
     </main>
   );
 };

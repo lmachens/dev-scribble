@@ -36,11 +36,11 @@ function Games() {
     <main className={GamesStyles.main}>
       Hello, <PlayerName>{playerName}</PlayerName>,<br />
       join or open a game.
-      <h2>Games</h2>
+      <h2>Open Games</h2>
       {games.length === 0 && <div>No games found</div>}
       {games.map((game) => (
-        <div className={GamesStyles.game}>
-          <a className={GamesStyles.joinGame} href={`/games/${game.gameId}`}>
+        <a className={GamesStyles.joinGame} href={`/games/${game.gameId}`}>
+          <div className={GamesStyles.game}>
             <div>
               {game.players.length} Players:{" "}
               {game.players.map((player) => (
@@ -48,13 +48,10 @@ function Games() {
               ))}
             </div>
             <span className={GamesStyles.joinGameLabel}>Join Game</span>
-          </a>
-        </div>
+          </div>
+        </a>
       ))}
-      <a
-        className={GamesStyles.openGame}
-        href={`/games/${socketRef.current?.id}`}
-      >
+      <a className="button" href={`/games/${socketRef.current?.id}`}>
         Open Game
       </a>
     </main>

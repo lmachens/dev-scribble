@@ -11,11 +11,14 @@ const PORT = 8080;
 const games = {};
 const players = {};
 
-function createGame(gameId) {
+function createGame(gameId, playerId) {
   games[gameId] = {
     gameId,
+    ownerId: playerId,
     players: [],
     drawOperations: [],
+    isRunning: false,
+    nextPlayer: null,
   };
   broadcaseListGamesUpdate();
 }
@@ -45,6 +48,9 @@ function broadcastDrawOperation(gameId, drawOperation) {
 }
 
 function addDrawOperation(gameId, drawOperation) {
+  if (!games[gameId]) {
+    return;
+  }
   games[gameId].drawOperations.push(drawOperation);
   broadcastDrawOperation(gameId, drawOperation);
 }
@@ -77,10 +83,12 @@ function removeGame(gameId) {
 }
 
 function getGames() {
-  return Object.values(games).map((game) => ({
-    gameId: game.gameId,
-    players: game.players,
-  }));
+  return Object.values(games)
+    .filter((game) => !game.isRunning)
+    .map((game) => ({
+      gameId: game.gameId,
+      players: game.players,
+    }));
 }
 function getPlayer(playerId) {
   return players[playerId];
@@ -88,6 +96,15 @@ function getPlayer(playerId) {
 
 function removePlayer(playerId) {
   delete players[playerId];
+}
+
+function startGame(gameId, playerId) {
+  if (games[gameId] && games[gameId].ownerId !== playerId) {
+    return;
+  }
+  games[gameId].isRunning = true;
+  broadcaseListGamesUpdate();
+  broadcastGameUpdate(gameId);
 }
 
 io.on("connection", (socket) => {
@@ -100,7 +117,7 @@ io.on("connection", (socket) => {
 
   socket.on("join game", ({ gameId, playerName }) => {
     if (!gameExists(gameId)) {
-      createGame(gameId);
+      createGame(gameId, playerId);
     }
     socket.join(gameId);
     joinGame(gameId, playerId, playerName);
@@ -112,6 +129,10 @@ io.on("connection", (socket) => {
     if (gameIsEmpty(gameId)) {
       removeGame(gameId);
     }
+  });
+
+  socket.on("start game", (gameId) => {
+    startGame(gameId, playerId);
   });
 
   socket.on("draw operation", ({ gameId, ...drawOperation }) => {

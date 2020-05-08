@@ -41,24 +41,3 @@
   text-transform: uppercase;
   outline: none;
 }
-
-.main button {
-  cursor: pointer;
-  margin-top: 24px;
-  color: #ddd;
-  background: none;
-  border: 1px solid #2f363d;
-  padding: 10px 14px;
-  font-size: 1.2rem;
-  transition: 0.5s;
-}
-
-.main button:disabled {
-  color: #2f363d;
-  border-color: transparent;
-}
-
-.main button:hover {
-  color: #ddd;
-  background: #2f363d;
-}
