@@ -15,7 +15,7 @@ function Games() {
       return;
     }
 
-    socketRef.current = SocketIO("http://localhost:8080");
+    socketRef.current = SocketIO();
     function handleListGames(games) {
       setGames(games);
     }

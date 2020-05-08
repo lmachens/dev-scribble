@@ -34,7 +34,7 @@ const Game = () => {
       return;
     }
 
-    socketRef.current = SocketIO("http://localhost:8080");
+    socketRef.current = SocketIO();
     socketRef.current.emit("join game", { gameId, playerName });
 
     function handleDrawOperation(drawOperation) {
@@ -43,7 +43,7 @@ const Game = () => {
 
     function handleRefreshGame(game) {
       setGame(game);
-      setSecret("");
+      setGuess("");
     }
 
     function handleGetSecret(secret) {
@@ -145,11 +145,12 @@ const Game = () => {
         nextPlayer={game.nextPlayer}
       />
       <div>
-        {game.owner.id === playerId && (
-          <button onClick={handleStartGameClick} disabled={game.isRunning}>
-            Start game
-          </button>
-        )}
+        <button
+          onClick={handleStartGameClick}
+          disabled={game.owner.id !== playerId || game.isRunning}
+        >
+          Start game
+        </button>
         <a className="button" href="/games">
           Exit game
         </a>
