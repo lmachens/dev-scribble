@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 const colors = ["orange", "green", "red"];
 const color = colors[Math.floor(Math.random() * colors.length)];
-function Canvas({ onChange, drawOperation }) {
+function Canvas({ onChange, drawOperation, oldDrawOperations }) {
   const canvasRef = useRef();
   const [previous, setPrevious] = useState(null);
   const [current, setCurrent] = useState(null);
@@ -25,9 +25,21 @@ function Canvas({ onChange, drawOperation }) {
   }, [onChange, drawing, previous, current]);
 
   useEffect(() => {
+    if (oldDrawOperations.length === 0) {
+      return;
+    }
+
+    oldDrawOperations.forEach(paint);
+  }, [oldDrawOperations]);
+
+  useEffect(() => {
     if (!drawOperation) {
       return;
     }
+    paint(drawOperation);
+  }, [drawOperation]);
+
+  function paint(drawOperation) {
     const ctx = canvasRef.current.getContext("2d");
     ctx.beginPath();
     ctx.moveTo(drawOperation.previous[0], drawOperation.previous[1]);
@@ -36,7 +48,7 @@ function Canvas({ onChange, drawOperation }) {
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.closePath();
-  }, [drawOperation]);
+  }
 
   function handleMouseDown(event) {
     setCurrent([
