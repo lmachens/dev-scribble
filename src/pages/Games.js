@@ -1,9 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
-import GamesStyles from "./games.module.css";
 import SocketIO from "socket.io-client";
 import { usePlayerName } from "../contexts/playerName";
 import SelectPlayerName from "../components/SelectPlayerName";
 import PlayerName from "../components/PlayerName";
+import { ButtonLink } from "../components/Button";
+import List from "../components/List";
+import styled from "@emotion/styled";
+import GameListItem from "../components/GameListItem";
+
+const Center = styled.div`
+  text-align: center;
+  padding: 10px;
+  width: 100%;
+`;
 
 function Games() {
   const socketRef = useRef(null);
@@ -33,28 +42,22 @@ function Games() {
   }
 
   return (
-    <main className={GamesStyles.main}>
-      Hello, <PlayerName>{playerName}</PlayerName>,<br />
-      join or open a game.
+    <Center>
+      <p>
+        Hello, <PlayerName>{playerName}</PlayerName>,<br />
+        join or open a game.
+      </p>
       <h2>Open Games</h2>
       {games.length === 0 && <div>No games found</div>}
-      {games.map((game) => (
-        <a className={GamesStyles.joinGame} href={`/games/${game.gameId}`}>
-          <div className={GamesStyles.game}>
-            <div>
-              {game.players.length} Players:{" "}
-              {game.players.map((player) => (
-                <PlayerName key={player.id}>{player.name}</PlayerName>
-              ))}
-            </div>
-            <span className={GamesStyles.joinGameLabel}>Join Game</span>
-          </div>
-        </a>
-      ))}
-      <a className="button" href={`/games/${socketRef.current?.id}`}>
+      <List>
+        {games.map((game) => (
+          <GameListItem key={game.gameId} game={game} />
+        ))}
+      </List>
+      <ButtonLink href={`/games/${socketRef.current?.id}`}>
         Open Game
-      </a>
-    </main>
+      </ButtonLink>
+    </Center>
   );
 }
 

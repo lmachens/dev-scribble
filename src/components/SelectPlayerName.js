@@ -3,10 +3,10 @@ import robotFace from "../assets/robot_face.png";
 import { usePlayerName } from "../contexts/playerName";
 import styled from "@emotion/styled";
 import Form from "./Form";
-import { goldenFullscreen, flexCenter } from "./styles";
+import { flexCenter } from "./styles";
+import Button from "./Button";
 
-const FullForm = styled(Form)`
-  ${goldenFullscreen};
+const FlexForm = styled(Form)`
   ${flexCenter};
 
   label {
@@ -40,8 +40,9 @@ const FullForm = styled(Form)`
     -webkit-text-fill-color: transparent;
     text-transform: uppercase;
     outline: none;
+    transition: 0.2s;
 
-    &:focus {
+    :focus {
       border-color: #116db6;
     }
   }
@@ -68,23 +69,21 @@ function SelectPlayerName({ onSubmit }) {
   }
 
   return (
-    <main>
-      <FullForm onSubmit={handleSubmit}>
-        <img src={robotFace} alt="Surprised Robot Face" />
-        <label>
-          Who are you?
-          <input
-            value={tempPlayerName}
-            onChange={handlePlayerNameChange}
-            autoFocus
-            autoCorrect="off"
-            autoComplete="off"
-            spellCheck={false}
-          />
-        </label>
-        <button disabled={tempPlayerName.length === 0}>Let me in</button>
-      </FullForm>
-    </main>
+    <FlexForm onSubmit={handleSubmit}>
+      <img src={robotFace} alt="Surprised Robot Face" />
+      <label>
+        Who are you?
+        <input
+          value={tempPlayerName}
+          onChange={handlePlayerNameChange}
+          autoFocus
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck={false}
+        />
+      </label>
+      <Button disabled={tempPlayerName.length === 0}>Let me in</Button>
+    </FlexForm>
   );
 }
 
