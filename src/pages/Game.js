@@ -9,6 +9,7 @@ import Button, { ButtonLink } from "../components/Button";
 import Players from "../components/Players";
 import { pickColor } from "../utils/colors";
 import GameActions from "../components/GameActions";
+import PlayerStatus from "../components/PlayerStatus";
 
 const Game = () => {
   const { gameId } = useParams();
@@ -81,7 +82,13 @@ const Game = () => {
     <div>
       <Players>
         {game.players.map((player) => (
-          <PlayerName key={player.id}>{player.name}</PlayerName>
+          <PlayerStatus
+            key={player.id}
+            isNextPlayer={game.isRunning && game.nextPlayer.id === player.id}
+            correctAnswer={true}
+          >
+            {player.name}
+          </PlayerStatus>
         ))}
       </Players>
       <GameActions

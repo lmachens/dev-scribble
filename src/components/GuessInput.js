@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Form from "./Form";
 import styled from "@emotion/styled";
 import { blinkAnimation } from "./styles";
-
-const HiddenInput = styled.input`
-  opacity: 0;
-  position: absolute;
-`;
 
 const Char = styled.span`
   margin: 2px;
@@ -20,23 +14,30 @@ function GuessInput({ onSubmit, secretLength, round }) {
     setGuess("");
   }, [round]);
 
-  function handleGuessChange(event) {
-    const newGuess = event.target.value.trim();
-    if (newGuess.length === secretLength) {
-      handleSubmit();
-      return;
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === "Backspace") {
+        setGuess((guess) => guess.substring(0, guess.length - 1));
+      } else if (event.key.trim().length === 1) {
+        setGuess((guess) => guess + event.key);
+      }
     }
-    setGuess(newGuess);
-  }
 
-  function handleSubmit() {
-    onSubmit(guess);
-    setGuess("");
-  }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (guess.length === secretLength) {
+      onSubmit(guess);
+      setGuess("");
+    }
+  }, [guess, secretLength, onSubmit]);
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <HiddenInput autoFocus value={guess} onChange={handleGuessChange} />
+    <>
       {Array(secretLength)
         .fill(null)
         .map((_, index) => (
@@ -44,7 +45,7 @@ function GuessInput({ onSubmit, secretLength, round }) {
             {guess[index] || "_"}
           </Char>
         ))}
-    </Form>
+    </>
   );
 }
 

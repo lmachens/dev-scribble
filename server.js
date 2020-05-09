@@ -24,6 +24,7 @@ function createGame(gameId, playerId, playerName) {
     nextSecret: null,
     nextSecretLength: 0,
     round: 0,
+    correctGuessings: [],
   };
   broadcaseListGamesUpdate();
 }
@@ -178,7 +179,10 @@ io.on("connection", (socket) => {
     socket.on("guess word", ({ gameId, guess }) => {
       const game = getGame(gameId);
       if (game.nextSecret.toLowerCase() === guess.toLowerCase()) {
-        newRound(gameId);
+        game.correctGuessings.push(playerId);
+        broadcastGameUpdate(gameId);
+
+        // newRound(gameId);
       }
     });
 

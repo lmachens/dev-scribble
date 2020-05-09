@@ -31,3 +31,32 @@ export const blink = keyframes`
 export const blinkAnimation = css`
   animation: ${blink} 1s ease infinite;
 `;
+
+export const fade = keyframes`
+  from {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+
+  }
+
+  to {
+    opacity: 1;
+  }
+`;
+
+export const fadeAnimation = css`
+  animation: ${fade} 2s ease infinite;
+`;
+
+export const scrollBackground = keyframes`
+  from {
+    background-position-x: 0px;
+  }
+
+  to {
+    background-position-x: 10000px
+  }
+`;
