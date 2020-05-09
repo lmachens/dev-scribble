@@ -92,6 +92,7 @@ function joinGame(gameId, playerId, playerName) {
   games[gameId].players.push({
     id: playerId,
     name: playerName,
+    points: 0,
   });
   broadcaseListGamesUpdate();
   broadcastGameUpdate(gameId);
@@ -180,9 +181,13 @@ io.on("connection", (socket) => {
       const game = getGame(gameId);
       if (game.nextSecret.toLowerCase() === guess.toLowerCase()) {
         game.correctGuessings.push(playerId);
+        const player = game.players.find((player) => player.id === playerId);
+        player.points++;
         broadcastGameUpdate(gameId);
 
-        // newRound(gameId);
+        if (game.correctGuessings.length === game.players.length) {
+          newRound(gameId);
+        }
       }
     });
 

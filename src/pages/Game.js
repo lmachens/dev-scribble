@@ -87,7 +87,7 @@ const Game = () => {
             isNextPlayer={game.isRunning && game.nextPlayer.id === player.id}
             correctAnswer={game.correctGuessings.includes(player.id)}
           >
-            {player.name}
+            {player.name}({player.points})
           </PlayerStatus>
         ))}
       </Players>
