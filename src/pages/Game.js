@@ -85,7 +85,7 @@ const Game = () => {
           <PlayerStatus
             key={player.id}
             isNextPlayer={game.isRunning && game.nextPlayer.id === player.id}
-            correctAnswer={true}
+            correctAnswer={game.correctGuessings.includes(player.id)}
           >
             {player.name}
           </PlayerStatus>
@@ -96,6 +96,7 @@ const Game = () => {
         isNextPlayer={game.isRunning && game.nextPlayer.id === playerId}
         secret={secret}
         onGuessSubmit={handleGuessSubmit}
+        correctAnswer={game.correctGuessings.includes(playerId)}
       />
       <Canvas
         onChange={handleCanvasChange}

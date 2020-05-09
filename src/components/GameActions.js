@@ -7,10 +7,17 @@ const Container = styled.div`
   margin-bottom: 10px;
 `;
 
-function GameActions({ game, isNextPlayer, secret, onGuessSubmit }) {
+function GameActions({
+  game,
+  isNextPlayer,
+  secret,
+  onGuessSubmit,
+  correctAnswer,
+}) {
   return (
     <Container>
-      {game.isRunning ? (
+      {correctAnswer && "Your answer is correct"}
+      {!correctAnswer && game.isRunning && (
         <span>
           {isNextPlayer ? (
             secret
@@ -22,7 +29,8 @@ function GameActions({ game, isNextPlayer, secret, onGuessSubmit }) {
             />
           )}
         </span>
-      ) : (
+      )}
+      {!correctAnswer && !game.isRunning && (
         <span>
           Waiting for <PlayerName>{game.owner.name}</PlayerName> to start...
         </span>
