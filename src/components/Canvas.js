@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./canvas.css";
+import styled from "@emotion/styled";
+
+const BorderCanvas = styled.canvas`
+  border: 1px solid #2f363d;
+  max-width: 100%;
+`;
 
 function calcDrawPosition(event, canvas) {
   return [
@@ -84,7 +89,7 @@ function Canvas({
   }
 
   return (
-    <canvas
+    <BorderCanvas
       ref={canvasRef}
       width="800"
       height="600"

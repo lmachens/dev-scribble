@@ -40,7 +40,7 @@ function GuessInput({ onSubmit, secretLength, round }) {
       {Array(secretLength)
         .fill(null)
         .map((_, index) => (
-          <Char key={index} blink={!guess[index]}>
+          <Char key={index} blink={guess.length === index}>
             {guess[index] || "_"}
           </Char>
         ))}

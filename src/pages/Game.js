@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import GameStyles from "./game.module.css";
 import Canvas from "../components/Canvas";
 import SocketIO from "socket.io-client";
 import { useParams } from "react-router-dom";
@@ -9,7 +8,7 @@ import PlayerName from "../components/PlayerName";
 import Button, { ButtonLink } from "../components/Button";
 import Players from "../components/Players";
 import { pickColor } from "../utils/colors";
-import GuessInput from "../components/GuessInput";
+import GameActions from "../components/GameActions";
 
 const Game = () => {
   const { gameId } = useParams();
@@ -66,7 +65,7 @@ const Game = () => {
     socketRef.current.emit("start game", gameId);
   }
 
-  function handleSubmitGuess(guess) {
+  function handleGuessSubmit(guess) {
     socketRef.current.emit("guess word", {
       guess,
       gameId,
@@ -85,25 +84,12 @@ const Game = () => {
           <PlayerName key={player.id}>{player.name}</PlayerName>
         ))}
       </Players>
-      <div className={GameStyles.status}>
-        {game.isRunning ? (
-          <span>
-            {game.nextPlayer.id === playerId ? (
-              secret
-            ) : (
-              <GuessInput
-                onSubmit={handleSubmitGuess}
-                secretLength={game.nextSecretLength}
-                round={game.round}
-              />
-            )}
-          </span>
-        ) : (
-          <span>
-            Waiting for <PlayerName>{game.owner.name}</PlayerName> to start...
-          </span>
-        )}
-      </div>
+      <GameActions
+        game={game}
+        isNextPlayer={game.isRunning && game.nextPlayer.id === playerId}
+        secret={secret}
+        onGuessSubmit={handleGuessSubmit}
+      />
       <Canvas
         onChange={handleCanvasChange}
         oldDrawOperations={game.drawOperations}
