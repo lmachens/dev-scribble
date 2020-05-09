@@ -1,25 +1,3 @@
-.main {
-  margin: 20px;
-  text-align: center;
-}
-
-.players {
-  margin-bottom: 20px;
-}
-
-.players > span {
-  margin-right: 6px;
-}
-
 .status {
   margin-bottom: 10px;
-}
-
-.char {
-  margin: 2px;
-}
-
-.guess {
-  opacity: 0;
-  position: absolute;
 }

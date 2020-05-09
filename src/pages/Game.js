@@ -6,19 +6,10 @@ import { useParams } from "react-router-dom";
 import { usePlayerName } from "../contexts/playerName";
 import SelectPlayerName from "../components/SelectPlayerName";
 import PlayerName from "../components/PlayerName";
-
-function hashCode(str) {
-  let hash = 0;
-  for (var i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return hash;
-}
-
-function pickColor(str) {
-  // Note the last value here is now 50% instead of 80%
-  return `hsl(${hashCode(str) % 360}, 100%, 50%)`;
-}
+import Button, { ButtonLink } from "../components/Button";
+import Players from "../components/Players";
+import { pickColor } from "../utils/colors";
+import GuessInput from "../components/GuessInput";
 
 const Game = () => {
   const { gameId } = useParams();
@@ -27,7 +18,6 @@ const Game = () => {
   const [game, setGame] = useState(null);
   const [playerName] = usePlayerName();
   const [secret, setSecret] = useState("");
-  const [guess, setGuess] = useState("");
 
   useEffect(() => {
     if (!playerName) {
@@ -43,7 +33,6 @@ const Game = () => {
 
     function handleRefreshGame(game) {
       setGame(game);
-      setGuess("");
     }
 
     function handleGetSecret(secret) {
@@ -77,21 +66,11 @@ const Game = () => {
     socketRef.current.emit("start game", gameId);
   }
 
-  function handleGuessChange(event) {
-    const newGuess = event.target.value.trim();
-    if (newGuess.length > game.nextSecretLength) {
-      return;
-    }
-    setGuess(newGuess);
-  }
-
-  function handleSubmitGuess(event) {
-    event.preventDefault();
+  function handleSubmitGuess(guess) {
     socketRef.current.emit("guess word", {
       guess,
       gameId,
     });
-    setGuess("");
   }
 
   if (!game) {
@@ -100,34 +79,23 @@ const Game = () => {
 
   const playerId = socketRef.current.id;
   return (
-    <main className={GameStyles.main}>
-      <div>{game.players.length ?? 0} Players</div>
-      <div className={GameStyles.players}>
+    <div>
+      <Players>
         {game.players.map((player) => (
           <PlayerName key={player.id}>{player.name}</PlayerName>
         ))}
-      </div>
+      </Players>
       <div className={GameStyles.status}>
         {game.isRunning ? (
           <span>
             {game.nextPlayer.id === playerId ? (
               secret
             ) : (
-              <form onSubmit={handleSubmitGuess}>
-                <input
-                  autoFocus
-                  className={GameStyles.guess}
-                  value={guess}
-                  onChange={handleGuessChange}
-                />
-                {Array(game.nextSecretLength)
-                  .fill(null)
-                  .map((_, index) => (
-                    <span key={index} className={GameStyles.char}>
-                      {guess[index] || "_"}
-                    </span>
-                  ))}
-              </form>
+              <GuessInput
+                onSubmit={handleSubmitGuess}
+                secretLength={game.nextSecretLength}
+                round={game.round}
+              />
             )}
           </span>
         ) : (
@@ -145,17 +113,15 @@ const Game = () => {
         nextPlayer={game.nextPlayer}
       />
       <div>
-        <button
+        <Button
           onClick={handleStartGameClick}
           disabled={game.owner.id !== playerId || game.isRunning}
         >
           Start game
-        </button>
-        <a className="button" href="/games">
-          Exit game
-        </a>
+        </Button>
+        <ButtonLink href="/games">Exit game</ButtonLink>
       </div>
-    </main>
+    </div>
   );
 };
 

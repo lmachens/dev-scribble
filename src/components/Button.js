@@ -3,7 +3,6 @@ import styled from "@emotion/styled";
 const Button = styled.button`
   display: inline-block;
   cursor: pointer;
-  margin-top: 24px;
   color: #ddd;
   background: none;
   border: 1px solid #2f363d;

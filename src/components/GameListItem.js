@@ -3,15 +3,10 @@ import ListItem from "./ListItem";
 import ListItemLink from "./ListItemLink";
 import PlayerName from "./PlayerName";
 import styled from "@emotion/styled";
+import Players from "./Players";
 
 const PaddingListItemLink = styled(ListItemLink)`
   padding: 10px;
-`;
-
-const Players = styled.div`
-  > * {
-    margin: 4px;
-  }
 `;
 
 function GameListItem({ game }) {

@@ -8,8 +8,7 @@ import List from "../components/List";
 import styled from "@emotion/styled";
 import GameListItem from "../components/GameListItem";
 
-const Center = styled.div`
-  text-align: center;
+const Container = styled.div`
   padding: 10px;
   width: 100%;
 `;
@@ -42,22 +41,22 @@ function Games() {
   }
 
   return (
-    <Center>
+    <Container>
       <p>
         Hello, <PlayerName>{playerName}</PlayerName>,<br />
         join or open a game.
       </p>
+      <ButtonLink href={`/games/${socketRef.current?.id}`}>
+        Open Game
+      </ButtonLink>
       <h2>Open Games</h2>
-      {games.length === 0 && <div>No games found</div>}
       <List>
+        {games.length === 0 && <div>No games found</div>}
         {games.map((game) => (
           <GameListItem key={game.gameId} game={game} />
         ))}
       </List>
-      <ButtonLink href={`/games/${socketRef.current?.id}`}>
-        Open Game
-      </ButtonLink>
-    </Center>
+    </Container>
   );
 }
 

@@ -23,6 +23,7 @@ function createGame(gameId, playerId, playerName) {
     nextPlayer: null,
     nextSecret: null,
     nextSecretLength: 0,
+    round: 0,
   };
   broadcaseListGamesUpdate();
 }
@@ -127,6 +128,7 @@ function newRound(gameId) {
   game.drawOperations = [];
   game.nextSecret = secrets[Math.floor(Math.random() * secrets.length)];
   game.nextSecretLength = game.nextSecret.length;
+  game.round++;
 
   io.to(game.nextPlayer.id).emit("get secret", game.nextSecret);
 

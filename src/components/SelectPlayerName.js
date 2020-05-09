@@ -11,6 +11,7 @@ const FlexForm = styled(Form)`
 
   label {
     margin-top: 10px;
+    margin-bottom: 24px;
     display: flex;
     align-items: center;
     flex-direction: column;

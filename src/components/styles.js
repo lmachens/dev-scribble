@@ -1,10 +1,9 @@
-import { css } from "@emotion/core";
+import { css, keyframes } from "@emotion/core";
 
 export const goldenRatioFullscreen = css`
   min-height: 100vh;
   width: 100vw;
-  padding-bottom: 10vh;
-  padding-bottom: 20vh;
+  padding: 5vh 10px 20vh 10px;
 `;
 
 export const flexCenter = css`
@@ -12,4 +11,23 @@ export const flexCenter = css`
   align-items: center;
   justify-content: center;
   flex-direction: column;
+`;
+
+export const blink = keyframes`
+  from {
+    color: inherit;
+  }
+
+  50% {
+    color: #116db6;
+
+  }
+
+  to {
+    color: inherit;
+  }
+`;
+
+export const blinkAnimation = css`
+  animation: ${blink} 1s ease infinite;
 `;
