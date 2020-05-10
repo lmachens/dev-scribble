@@ -1,11 +1,5 @@
 import { css, keyframes } from "@emotion/core";
 
-export const goldenRatioFullscreen = css`
-  min-height: 100vh;
-  width: 100vw;
-  padding: 5vh 10px 20vh 10px;
-`;
-
 export const flexCenter = css`
   display: flex;
   align-items: center;

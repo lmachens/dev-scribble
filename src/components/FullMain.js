@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
-import { goldenRatioFullscreen, flexCenter } from "./styles";
+import { flexCenter } from "./styles";
 
 const FullMain = styled.main`
-  ${goldenRatioFullscreen};
+  min-height: 100vh;
+  width: 100vw;
   ${flexCenter};
   text-align: center;
 `;
