@@ -8,6 +8,15 @@ const Char = styled.span`
   ${(props) => (props.blink ? blinkAnimation : "")};
 `;
 
+const Container = styled.div`
+  position: relative;
+`;
+
+const HiddenInput = styled.input`
+  opacity: 0;
+  position: absolute;
+`;
+
 function GuessInput({ onSubmit, secretLength, round }) {
   const [guess, setGuess] = useKeyDownState("");
 
@@ -23,7 +32,14 @@ function GuessInput({ onSubmit, secretLength, round }) {
   }, [guess, secretLength, onSubmit, setGuess]);
 
   return (
-    <>
+    <Container>
+      <HiddenInput
+        value={guess}
+        autoFocus
+        autoCorrect="off"
+        autoComplete="off"
+        spellCheck={false}
+      />
       {Array(secretLength)
         .fill(null)
         .map((_, index) => (
@@ -31,7 +47,7 @@ function GuessInput({ onSubmit, secretLength, round }) {
             {guess[index] || "_"}
           </Char>
         ))}
-    </>
+    </Container>
   );
 }
 
