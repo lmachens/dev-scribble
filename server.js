@@ -31,6 +31,9 @@ function createGame(gameId, playerId, playerName) {
 
 function leaveGame(gameId, playerId) {
   const game = games[gameId];
+  if (!game) {
+    return;
+  }
   game.players = game.players.filter((player) => player.id !== playerId);
 
   if (gameIsEmpty(gameId)) {
@@ -67,6 +70,10 @@ function broadcaseListGamesUpdate() {
   io.emit("list games", getGames());
 }
 
+function broadcastGuessWord(gameId, guess, playerId) {
+  io.to(gameId).emit("guess word", { guess, playerId });
+}
+
 function broadcastDrawOperation(gameId, drawOperation) {
   io.to(gameId).emit("draw operation", drawOperation);
 }
@@ -89,6 +96,9 @@ function initializePlayer(playerId) {
 
 function joinGame(gameId, playerId, playerName) {
   players[playerId].gameId = gameId;
+  if (games[gameId].players.find((player) => player.id === playerId)) {
+    return;
+  }
   games[gameId].players.push({
     id: playerId,
     name: playerName,
@@ -185,9 +195,11 @@ io.on("connection", (socket) => {
         player.points++;
         broadcastGameUpdate(gameId);
 
-        if (game.correctGuessings.length === game.players.length) {
+        if (game.correctGuessings.length === game.players.length - 1) {
           newRound(gameId);
         }
+      } else {
+        broadcastGuessWord(gameId, guess, playerId);
       }
     });
 

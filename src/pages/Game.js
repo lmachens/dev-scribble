@@ -4,7 +4,6 @@ import SocketIO from "socket.io-client";
 import { useParams } from "react-router-dom";
 import { usePlayerName } from "../contexts/playerName";
 import SelectPlayerName from "../components/SelectPlayerName";
-import PlayerName from "../components/PlayerName";
 import Button, { ButtonLink } from "../components/Button";
 import Players from "../components/Players";
 import { pickColor } from "../utils/colors";
@@ -18,6 +17,12 @@ const Game = () => {
   const [game, setGame] = useState(null);
   const [playerName] = usePlayerName();
   const [secret, setSecret] = useState("");
+  const [guessings, setGuessings] = useState([]);
+
+  const round = game ? game.round : 1;
+  useEffect(() => {
+    setGuessings([]);
+  }, [round, setGuessings]);
 
   useEffect(() => {
     if (!playerName) {
@@ -39,14 +44,19 @@ const Game = () => {
       setSecret(secret);
     }
 
+    function handleGuessWord({ guess, playerId }) {
+      setGuessings((guessings) => [...guessings, { guess, playerId }]);
+    }
+
     socketRef.current.on("draw operation", handleDrawOperation);
     socketRef.current.on("refresh game", handleRefreshGame);
     socketRef.current.on("get secret", handleGetSecret);
-
+    socketRef.current.on("guess word", handleGuessWord);
     return () => {
       socketRef.current.off(handleDrawOperation);
       socketRef.current.off(handleRefreshGame);
       socketRef.current.off(handleGetSecret);
+      socketRef.current.off(handleGuessWord);
       socketRef.current.emit("leave game", gameId);
     };
   }, [playerName, gameId]);
@@ -86,6 +96,9 @@ const Game = () => {
             key={player.id}
             isNextPlayer={game.isRunning && game.nextPlayer.id === player.id}
             correctAnswer={game.correctGuessings.includes(player.id)}
+            guessings={guessings.filter(
+              (guessing) => guessing.playerId === player.id
+            )}
           >
             {player.name}({player.points})
           </PlayerStatus>

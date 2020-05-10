@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import styled from "@emotion/styled";
 import { blinkAnimation } from "./styles";
+import useKeyDownState from "../hooks/useKeyDownState";
 
 const Char = styled.span`
   margin: 2px;
@@ -8,33 +9,18 @@ const Char = styled.span`
 `;
 
 function GuessInput({ onSubmit, secretLength, round }) {
-  const [guess, setGuess] = useState("");
+  const [guess, setGuess] = useKeyDownState("");
 
   useEffect(() => {
     setGuess("");
-  }, [round]);
-
-  useEffect(() => {
-    function handleKeyDown(event) {
-      if (event.key === "Backspace") {
-        setGuess((guess) => guess.substring(0, guess.length - 1));
-      } else if (event.key.trim().length === 1) {
-        setGuess((guess) => guess + event.key);
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+  }, [round, setGuess]);
 
   useEffect(() => {
     if (guess.length === secretLength) {
       onSubmit(guess);
       setGuess("");
     }
-  }, [guess, secretLength, onSubmit]);
+  }, [guess, secretLength, onSubmit, setGuess]);
 
   return (
     <>

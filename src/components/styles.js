@@ -60,3 +60,19 @@ export const scrollBackground = keyframes`
     background-position-x: 10000px
   }
 `;
+
+export const fadeOut = keyframes`
+  from {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(-200%);
+    opacity: 0;
+  }
+`;
+
+export const fadeOutAnimation = css`
+  animation: ${fadeOut} 2s ease;
+`;
