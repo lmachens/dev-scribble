@@ -123,6 +123,7 @@ const Game = () => {
         onGuessSubmit={handleGuessSubmit}
         correctAnswer={game.correctGuessings.includes(playerId)}
         timeLeft={timeLeft}
+        secretHints={game.secretHints}
       />
       <Canvas
         onChange={handleCanvasChange}

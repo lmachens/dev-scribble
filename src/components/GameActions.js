@@ -18,6 +18,7 @@ function GameActions({
   onGuessSubmit,
   correctAnswer,
   timeLeft,
+  secretHints,
 }) {
   return (
     <Container>
@@ -36,6 +37,7 @@ function GameActions({
               onSubmit={onGuessSubmit}
               secretLength={game.nextSecretLength}
               round={game.round}
+              secretHints={secretHints}
             />
           )}
         </span>

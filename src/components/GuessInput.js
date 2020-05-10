@@ -5,6 +5,7 @@ import useKeyDownState from "../hooks/useKeyDownState";
 
 const Char = styled.span`
   margin: 2px;
+  opacity: ${(props) => (props.hint ? 0.5 : 1)};
   ${(props) => (props.blink ? blinkAnimation : "")};
 `;
 
@@ -17,7 +18,7 @@ const HiddenInput = styled.input`
   position: absolute;
 `;
 
-function GuessInput({ onSubmit, secretLength, round }) {
+function GuessInput({ onSubmit, secretLength, round, secretHints }) {
   const [guess, setGuess] = useState("");
   const [key] = useKeyDownState("");
 
@@ -58,8 +59,12 @@ function GuessInput({ onSubmit, secretLength, round }) {
       {Array(secretLength)
         .fill(null)
         .map((_, index) => (
-          <Char key={index} blink={guess.length === index}>
-            {guess[index] || "_"}
+          <Char
+            key={index}
+            blink={guess.length === index}
+            hint={Boolean(secretHints[index])}
+          >
+            {guess[index] || secretHints[index] || "_"}
           </Char>
         ))}
     </Container>
