@@ -32,7 +32,7 @@ function Canvas({
   }, [nextPlayer]);
 
   useEffect(() => {
-    if (!drawing || disabled) {
+    if (!drawing || disabled || !previous || !current) {
       return;
     }
 
@@ -78,7 +78,7 @@ function Canvas({
     setDrawing(true);
   }
 
-  function handleMouseUp(event) {
+  function handleMouseUp() {
     setDrawing(false);
     setCurrent(null);
   }
@@ -86,6 +86,28 @@ function Canvas({
   function handleMouseMove(event) {
     setPrevious(current);
     setCurrent(calcDrawPosition(event, canvasRef.current));
+  }
+
+  function handleTouchStart(event) {
+    const touch = event.touches[0];
+    const mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    handleMouseDown(mouseEvent);
+  }
+
+  function handleTouchEnd(event) {
+    handleMouseUp();
+  }
+
+  function handleTouchMove(event) {
+    const touch = event.touches[0];
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    handleMouseMove(mouseEvent);
   }
 
   return (
@@ -96,6 +118,9 @@ function Canvas({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={handleTouchMove}
     />
   );
 }
