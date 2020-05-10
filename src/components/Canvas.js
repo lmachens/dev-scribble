@@ -1,9 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
+import Button from "./Button";
 
 const BorderCanvas = styled.canvas`
   border: 1px solid #2f363d;
   max-width: 100%;
+`;
+
+const Actions = styled.div`
+  display: flex;
+  border: 1px solid #2f363d;
+  border-bottom: none;
+  justify-content: flex-end;
+`;
+
+const CanvasAction = styled(Button)`
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border: none;
+  border-left: 1px solid #2f363d;
 `;
 
 function calcDrawPosition(event, canvas) {
@@ -20,6 +35,8 @@ function Canvas({
   color,
   disabled,
   nextPlayer,
+  onClear,
+  redrawTimestamp,
 }) {
   const canvasRef = useRef();
   const [previous, setPrevious] = useState(null);
@@ -29,7 +46,10 @@ function Canvas({
   useEffect(() => {
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-  }, [nextPlayer]);
+
+    oldDrawOperations.forEach(paint);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextPlayer, redrawTimestamp]);
 
   useEffect(() => {
     if (!drawing || disabled || !previous || !current) {
@@ -48,14 +68,6 @@ function Canvas({
   }, [onChange, drawing, previous, current, color, disabled]);
 
   useEffect(() => {
-    if (oldDrawOperations.length === 0) {
-      return;
-    }
-
-    oldDrawOperations.forEach(paint);
-  }, [oldDrawOperations]);
-
-  useEffect(() => {
     if (!drawOperation) {
       return;
     }
@@ -64,6 +76,7 @@ function Canvas({
 
   function paint(drawOperation) {
     const ctx = canvasRef.current.getContext("2d");
+
     ctx.beginPath();
     ctx.moveTo(drawOperation.previous[0], drawOperation.previous[1]);
     ctx.lineTo(drawOperation.current[0], drawOperation.current[1]);
@@ -81,6 +94,7 @@ function Canvas({
   function handleMouseUp() {
     setDrawing(false);
     setCurrent(null);
+    setPrevious(null);
   }
 
   function handleMouseMove(event) {
@@ -111,17 +125,24 @@ function Canvas({
   }
 
   return (
-    <BorderCanvas
-      ref={canvasRef}
-      width="800"
-      height="600"
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchMove={handleTouchMove}
-    />
+    <>
+      <Actions>
+        <CanvasAction onClick={onClear} disabled={disabled}>
+          Clear
+        </CanvasAction>
+      </Actions>
+      <BorderCanvas
+        ref={canvasRef}
+        width="800"
+        height="600"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
+      />
+    </>
   );
 }
 

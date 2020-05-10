@@ -91,6 +91,10 @@ const Game = () => {
     });
   }
 
+  function handleClear() {
+    socketRef.current.emit("clear canvas", gameId);
+  }
+
   if (!game) {
     return <div>Connecting...</div>;
   }
@@ -132,6 +136,8 @@ const Game = () => {
         color={pickColor(playerName)}
         disabled={game.isRunning && game.nextPlayer.id !== playerId}
         nextPlayer={game.nextPlayer}
+        onClear={handleClear}
+        redrawTimestamp={game.redrawTimestamp}
       />
       <div>
         <Button
