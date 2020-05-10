@@ -25,6 +25,8 @@ function createGame(gameId, playerId, playerName) {
     nextSecretLength: 0,
     round: 0,
     correctGuessings: [],
+    timeLeft: 30,
+    timeLeftIntervalId: null,
   };
   broadcaseListGamesUpdate();
 }
@@ -51,19 +53,27 @@ function gameExists(gameId) {
 }
 
 function getGame(gameId) {
-  return games[gameId];
+  if (!games[gameId]) {
+    return;
+  }
+  const { timeLeftIntervalId, ...game } = games[gameId];
+  return game;
 }
 
 function getGameWithoutSecret(gameId) {
   if (!games[gameId]) {
     return;
   }
-  const { nextSecret, ...game } = games[gameId];
+  const { nextSecret, timeLeftIntervalId, ...game } = games[gameId];
   return game;
 }
 
 function broadcastGameUpdate(gameId) {
   io.to(gameId).emit("refresh game", getGameWithoutSecret(gameId));
+}
+
+function broadcastTimeLeft(gameId, timeLeft) {
+  io.to(gameId).emit("time left", timeLeft);
 }
 
 function broadcaseListGamesUpdate() {
@@ -134,13 +144,29 @@ function removePlayer(playerId) {
 }
 
 function newRound(gameId) {
-  const game = getGame(gameId);
+  const game = games[gameId];
+  if (!game) {
+    return;
+  }
+  clearInterval(game.timeLeftIntervalId);
+
   game.nextPlayer =
     game.players[Math.floor(Math.random() * game.players.length)];
   game.drawOperations = [];
   game.nextSecret = secrets[Math.floor(Math.random() * secrets.length)];
   game.nextSecretLength = game.nextSecret.length;
+  game.correctGuessings = [];
   game.round++;
+  game.timeLeft = 30;
+
+  game.timeLeftIntervalId = setInterval(() => {
+    game.timeLeft--;
+    broadcastTimeLeft(gameId, game.timeLeft);
+    if (game.timeLeft <= 0) {
+      clearInterval(game.timeLeftIntervalId);
+      newRound(gameId);
+    }
+  }, 1000);
 
   io.to(game.nextPlayer.id).emit("get secret", game.nextSecret);
 

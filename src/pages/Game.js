@@ -18,6 +18,7 @@ const Game = () => {
   const [playerName] = usePlayerName();
   const [secret, setSecret] = useState("");
   const [guessings, setGuessings] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   const round = game ? game.round : 1;
   useEffect(() => {
@@ -48,15 +49,22 @@ const Game = () => {
       setGuessings((guessings) => [...guessings, { guess, playerId }]);
     }
 
+    function handleTimeLeft(timeLeft) {
+      setTimeLeft(timeLeft);
+    }
+
     socketRef.current.on("draw operation", handleDrawOperation);
     socketRef.current.on("refresh game", handleRefreshGame);
     socketRef.current.on("get secret", handleGetSecret);
     socketRef.current.on("guess word", handleGuessWord);
+    socketRef.current.on("time left", handleTimeLeft);
+
     return () => {
       socketRef.current.off(handleDrawOperation);
       socketRef.current.off(handleRefreshGame);
       socketRef.current.off(handleGetSecret);
       socketRef.current.off(handleGuessWord);
+      socketRef.current.off(handleTimeLeft);
       socketRef.current.emit("leave game", gameId);
     };
   }, [playerName, gameId]);
@@ -94,7 +102,11 @@ const Game = () => {
         {game.players.map((player) => (
           <PlayerStatus
             key={player.id}
-            isNextPlayer={game.isRunning && game.nextPlayer.id === player.id}
+            isNextPlayer={
+              game.isRunning &&
+              game.nextPlayer &&
+              game.nextPlayer.id === player.id
+            }
             correctAnswer={game.correctGuessings.includes(player.id)}
             guessings={guessings.filter(
               (guessing) => guessing.playerId === player.id
@@ -110,6 +122,7 @@ const Game = () => {
         secret={secret}
         onGuessSubmit={handleGuessSubmit}
         correctAnswer={game.correctGuessings.includes(playerId)}
+        timeLeft={timeLeft}
       />
       <Canvas
         onChange={handleCanvasChange}

@@ -7,15 +7,25 @@ const Container = styled.div`
   margin-bottom: 10px;
 `;
 
+const Round = styled.div`
+  font-weight: bold;
+`;
+
 function GameActions({
   game,
   isNextPlayer,
   secret,
   onGuessSubmit,
   correctAnswer,
+  timeLeft,
 }) {
   return (
     <Container>
+      {game.isRunning && (
+        <Round>
+          Round {game.round}: {timeLeft}s
+        </Round>
+      )}
       {correctAnswer && "Your answer is correct"}
       {!correctAnswer && game.isRunning && (
         <span>
