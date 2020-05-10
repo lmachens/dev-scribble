@@ -135,7 +135,11 @@ const Game = () => {
       <div>
         <Button
           onClick={handleStartGameClick}
-          disabled={game.owner.id !== playerId || game.isRunning}
+          disabled={
+            game.owner.id !== playerId ||
+            game.isRunning ||
+            game.players.length <= 1
+          }
         >
           Start game
         </Button>

@@ -38,8 +38,10 @@ function PlayerStatus({ children, guessings, isNextPlayer, correctAnswer }) {
       >
         {children}
       </PlayerStatusName>
-      {guessings.map((guessing) => (
-        <LastGuessing key={guessing.guess}>{guessing.guess}</LastGuessing>
+      {guessings.map((guessing, index) => (
+        <LastGuessing key={`${index}: ${guessing.guess}`}>
+          {guessing.guess}
+        </LastGuessing>
       ))}
     </Container>
   );
