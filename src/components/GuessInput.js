@@ -20,19 +20,22 @@ const HiddenInput = styled.input`
 
 function GuessInput({ onSubmit, secretLength, round, secretHints }) {
   const [guess, setGuess] = useState("");
-  const [key] = useKeyDownState("");
+  const [keyEvent] = useKeyDownState();
 
   useEffect(() => {
     setGuess("");
   }, [round, setGuess]);
 
   useEffect(() => {
-    if (key === "Backspace") {
-      setGuess((guess) => guess.substring(0, guess.length - 1));
-    } else if (key.length === 1) {
-      setGuess((guess) => guess + key);
+    if (!keyEvent) {
+      return;
     }
-  }, [key]);
+    if (keyEvent.key === "Backspace") {
+      setGuess((guess) => guess.substring(0, guess.length - 1));
+    } else if (keyEvent.key.length === 1) {
+      setGuess((guess) => guess + keyEvent.key);
+    }
+  }, [keyEvent]);
 
   useEffect(() => {
     if (guess.length === secretLength) {

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 
 function useKeyDownState() {
-  const [key, setKey] = useState("");
+  const [keyEvent, setKeyEvent] = useState(null);
 
   useEffect(() => {
     function handleKeyDown(event) {
-      setKey(event.key);
+      setKeyEvent({
+        timestamp: Date.now(),
+        key: event.key,
+      });
     }
 
     document.addEventListener("keydown", handleKeyDown);
@@ -15,7 +18,7 @@ function useKeyDownState() {
     };
   }, []);
 
-  return [key, setKey];
+  return [keyEvent, setKeyEvent];
 }
 
 export default useKeyDownState;
