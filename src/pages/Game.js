@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Canvas from "../components/Canvas";
 import SocketIO from "socket.io-client";
 import { useParams } from "react-router-dom";
@@ -69,30 +69,36 @@ const Game = () => {
     };
   }, [playerName, gameId]);
 
+  const handleCanvasChange = useCallback(
+    (drawOperation) => {
+      socketRef.current.emit("draw operation", {
+        ...drawOperation,
+        gameId,
+      });
+    },
+    [gameId]
+  );
+
+  const handleStartGameClick = useCallback(() => {
+    socketRef.current.emit("start game", gameId);
+  }, [gameId]);
+
+  const handleGuessSubmit = useCallback(
+    (guess) => {
+      socketRef.current.emit("guess word", {
+        guess,
+        gameId,
+      });
+    },
+    [gameId]
+  );
+
+  const handleClear = useCallback(() => {
+    socketRef.current.emit("clear canvas", gameId);
+  }, [gameId]);
+
   if (!playerName) {
     return <SelectPlayerName />;
-  }
-
-  function handleCanvasChange(drawOperation) {
-    socketRef.current.emit("draw operation", {
-      ...drawOperation,
-      gameId,
-    });
-  }
-
-  function handleStartGameClick() {
-    socketRef.current.emit("start game", gameId);
-  }
-
-  function handleGuessSubmit(guess) {
-    socketRef.current.emit("guess word", {
-      guess,
-      gameId,
-    });
-  }
-
-  function handleClear() {
-    socketRef.current.emit("clear canvas", gameId);
   }
 
   if (!game) {

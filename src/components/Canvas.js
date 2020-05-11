@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import styled from "@emotion/styled";
 import Button from "./Button";
 
@@ -55,7 +55,6 @@ function Canvas({
     if (!drawing || disabled || !previous || !current) {
       return;
     }
-
     const ctx = canvasRef.current.getContext("2d");
     ctx.beginPath();
     ctx.moveTo(previous[0], previous[1]);
@@ -67,14 +66,7 @@ function Canvas({
     onChange({ previous, current, color });
   }, [onChange, drawing, previous, current, color, disabled]);
 
-  useEffect(() => {
-    if (!drawOperation) {
-      return;
-    }
-    paint(drawOperation);
-  }, [drawOperation]);
-
-  function paint(drawOperation) {
+  const paint = useCallback((drawOperation) => {
     const ctx = canvasRef.current.getContext("2d");
 
     ctx.beginPath();
@@ -84,45 +76,64 @@ function Canvas({
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.closePath();
-  }
+  }, []);
 
-  function handleMouseDown(event) {
+  useEffect(() => {
+    if (!drawOperation) {
+      return;
+    }
+    paint(drawOperation);
+  }, [drawOperation, paint]);
+
+  const handleMouseDown = useCallback((event) => {
     setCurrent(calcDrawPosition(event, canvasRef.current));
     setDrawing(true);
-  }
+  }, []);
 
-  function handleMouseUp() {
+  const handleMouseUp = useCallback(() => {
     setDrawing(false);
     setCurrent(null);
     setPrevious(null);
-  }
+  }, []);
 
-  function handleMouseMove(event) {
-    setPrevious(current);
-    setCurrent(calcDrawPosition(event, canvasRef.current));
-  }
+  const handleMouseMove = useCallback(
+    (event) => {
+      setPrevious(current);
+      setCurrent(calcDrawPosition(event, canvasRef.current));
+    },
+    [current]
+  );
 
-  function handleTouchStart(event) {
-    const touch = event.touches[0];
-    const mouseEvent = new MouseEvent("mousedown", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    handleMouseDown(mouseEvent);
-  }
+  const handleTouchStart = useCallback(
+    (event) => {
+      const touch = event.touches[0];
+      const mouseEvent = new MouseEvent("mousedown", {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      handleMouseDown(mouseEvent);
+    },
+    [handleMouseDown]
+  );
 
-  function handleTouchEnd(event) {
-    handleMouseUp();
-  }
+  const handleTouchEnd = useCallback(
+    (event) => {
+      handleMouseUp();
+    },
+    [handleMouseUp]
+  );
 
-  function handleTouchMove(event) {
-    const touch = event.touches[0];
-    const mouseEvent = new MouseEvent("mousemove", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    handleMouseMove(mouseEvent);
-  }
+  const handleTouchMove = useCallback(
+    (event) => {
+      const touch = event.touches[0];
+      const mouseEvent = new MouseEvent("mousemove", {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      handleMouseMove(mouseEvent);
+    },
+    [handleMouseMove]
+  );
 
   return (
     <>
