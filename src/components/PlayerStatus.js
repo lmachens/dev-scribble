@@ -25,6 +25,8 @@ const Container = styled.span`
 const LastGuessing = styled.span`
   position: absolute;
   left: 0;
+  right: 0;
+  text-align: center;
   opacity: 0;
   ${fadeOutAnimation}
 `;

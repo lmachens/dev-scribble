@@ -20,6 +20,8 @@ function GameActions({
   timeLeft,
   secretHints,
 }) {
+  const visibleSecret = game.oldSecret || secret;
+
   return (
     <Container>
       {game.isRunning && (
@@ -32,11 +34,11 @@ function GameActions({
           </span>
         </Round>
       )}
-      {correctAnswer && "Your answer is correct"}
+      {correctAnswer && visibleSecret}
       {!correctAnswer && game.isRunning && (
         <span>
           {isNextPlayer || game.oldSecret ? (
-            game.oldSecret || secret
+            visibleSecret
           ) : (
             <GuessInput
               onSubmit={onGuessSubmit}
