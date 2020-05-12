@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import styled from "@emotion/styled";
 import Button from "./Button";
 
+const Container = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
 const Border = styled.div`
   border: 1px solid #2f363d;
   overflow: hidden;
@@ -140,7 +145,7 @@ function Canvas({
   );
 
   return (
-    <>
+    <Container>
       <Actions>
         <CanvasAction onClick={onClear} disabled={disabled}>
           Clear
@@ -159,7 +164,7 @@ function Canvas({
           onTouchMove={drawing ? handleTouchMove : undefined}
         />
       </Border>
-    </>
+    </Container>
   );
 }
 
