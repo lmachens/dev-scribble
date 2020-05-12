@@ -38,7 +38,7 @@ function GuessInput({ onSubmit, secretLength, round, secretHints }) {
   }, [keyEvent]);
 
   useEffect(() => {
-    if (guess.length === secretLength) {
+    if (guess.length > 0 && guess.length === secretLength) {
       onSubmit(guess);
       setGuess("");
     }

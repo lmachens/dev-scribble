@@ -24,14 +24,19 @@ function GameActions({
     <Container>
       {game.isRunning && (
         <Round>
-          Round {game.round}: {timeLeft}s
+          Round {game.round}:{" "}
+          <span>
+            {game.oldSecret
+              ? `${game.nextPlayer.name.toUpperCase()} is next`
+              : `${timeLeft}s`}
+          </span>
         </Round>
       )}
       {correctAnswer && "Your answer is correct"}
       {!correctAnswer && game.isRunning && (
         <span>
-          {isNextPlayer ? (
-            secret
+          {isNextPlayer || game.oldSecret ? (
+            game.oldSecret || secret
           ) : (
             <GuessInput
               onSubmit={onGuessSubmit}

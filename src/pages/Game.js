@@ -112,11 +112,7 @@ const Game = () => {
         {game.players.map((player) => (
           <PlayerStatus
             key={player.id}
-            isNextPlayer={
-              game.isRunning &&
-              game.nextPlayer &&
-              game.nextPlayer.id === player.id
-            }
+            isNextPlayer={game.nextPlayer && game.nextPlayer.id === player.id}
             correctAnswer={game.correctGuessings.includes(player.id)}
             guessings={guessings.filter(
               (guessing) => guessing.playerId === player.id
@@ -128,7 +124,7 @@ const Game = () => {
       </Players>
       <GameActions
         game={game}
-        isNextPlayer={game.isRunning && game.nextPlayer.id === playerId}
+        isNextPlayer={game.nextPlayer && game.nextPlayer.id === playerId}
         secret={secret}
         onGuessSubmit={handleGuessSubmit}
         correctAnswer={game.correctGuessings.includes(playerId)}
@@ -140,7 +136,7 @@ const Game = () => {
         oldDrawOperations={game.drawOperations}
         drawOperation={drawOperation}
         color={pickColor(playerName)}
-        disabled={game.isRunning && game.nextPlayer.id !== playerId}
+        disabled={game.nextPlayer && game.nextPlayer.id !== playerId}
         nextPlayer={game.nextPlayer}
         onClear={handleClear}
         redrawTimestamp={game.redrawTimestamp}
