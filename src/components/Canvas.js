@@ -34,11 +34,13 @@ function Canvas({
 
     ctx.strokeStyle = drawOperation.color;
     ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+
     ctx.beginPath();
     ctx.moveTo(drawOperation.previous[0], drawOperation.previous[1]);
     ctx.lineTo(drawOperation.current[0], drawOperation.current[1]);
-    ctx.closePath();
     ctx.stroke();
+    ctx.closePath();
   }, []);
 
   useEffect(() => {
