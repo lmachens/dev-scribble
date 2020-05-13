@@ -29,6 +29,18 @@ function Canvas({
   const [current, setCurrent] = useState(null);
   const [drawing, setDrawing] = useState(false);
 
+  const paint = useCallback((drawOperation) => {
+    const ctx = canvasRef.current.getContext("2d");
+
+    ctx.strokeStyle = drawOperation.color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(drawOperation.previous[0], drawOperation.previous[1]);
+    ctx.lineTo(drawOperation.current[0], drawOperation.current[1]);
+    ctx.closePath();
+    ctx.stroke();
+  }, []);
+
   useEffect(() => {
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -41,28 +53,14 @@ function Canvas({
     if (!drawing || disabled || !previous || !current) {
       return;
     }
-    const ctx = canvasRef.current.getContext("2d");
-    ctx.beginPath();
-    ctx.moveTo(previous[0], previous[1]);
-    ctx.lineTo(current[0], current[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.closePath();
+    paint({
+      previous,
+      current,
+      color,
+    });
+
     onChange({ previous, current, color });
-  }, [onChange, drawing, previous, current, color, disabled]);
-
-  const paint = useCallback((drawOperation) => {
-    const ctx = canvasRef.current.getContext("2d");
-
-    ctx.beginPath();
-    ctx.moveTo(drawOperation.previous[0], drawOperation.previous[1]);
-    ctx.lineTo(drawOperation.current[0], drawOperation.current[1]);
-    ctx.strokeStyle = drawOperation.color;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.closePath();
-  }, []);
+  }, [onChange, drawing, previous, current, color, disabled, paint]);
 
   useEffect(() => {
     if (!drawOperation) {
