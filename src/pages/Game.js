@@ -6,7 +6,7 @@ import SelectPlayerName from "../components/SelectPlayerName";
 import Button, { ButtonLink } from "../components/Button";
 import Players from "../components/Players";
 import { pickColor } from "../utils/colors";
-import GameActions from "../components/GameActions";
+import GameStatus from "../components/GameStatus";
 import PlayerStatus from "../components/PlayerStatus";
 import { useSocket } from "../contexts/socket";
 
@@ -121,7 +121,7 @@ const Game = () => {
           </PlayerStatus>
         ))}
       </Players>
-      <GameActions
+      <GameStatus
         game={game}
         isNextPlayer={game.nextPlayer && game.nextPlayer.id === playerId}
         secret={secret}

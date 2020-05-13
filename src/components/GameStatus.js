@@ -11,7 +11,7 @@ const Round = styled.div`
   font-weight: bold;
 `;
 
-function GameActions({
+function GameStatus({
   game,
   isNextPlayer,
   secret,
@@ -58,4 +58,4 @@ function GameActions({
   );
 }
 
-export default GameActions;
+export default GameStatus;
