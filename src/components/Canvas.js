@@ -53,13 +53,13 @@ function Canvas({
     if (!drawing || disabled || !previous || !current) {
       return;
     }
-    paint({
+    const drawOperation = {
       previous,
       current,
       color,
-    });
-
-    onChange({ previous, current, color });
+    };
+    paint(drawOperation);
+    onChange(drawOperation);
   }, [onChange, drawing, previous, current, color, disabled, paint]);
 
   useEffect(() => {
