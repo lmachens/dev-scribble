@@ -20,7 +20,6 @@ function Canvas({
   oldDrawOperations,
   color,
   disabled,
-  nextPlayer,
   redrawTimestamp,
   distraction,
 }) {
@@ -44,13 +43,15 @@ function Canvas({
   }, []);
 
   useEffect(() => {
-    if (!oldDrawOperations) {
-      return;
-    }
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    oldDrawOperations.forEach(paint);
-  }, [nextPlayer, redrawTimestamp, oldDrawOperations, paint]);
+  }, [redrawTimestamp]);
+
+  useEffect(() => {
+    if (oldDrawOperations) {
+      oldDrawOperations.forEach(paint);
+    }
+  }, [oldDrawOperations, paint]);
 
   useEffect(() => {
     if (!drawing || disabled || !previous || !current) {

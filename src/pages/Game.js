@@ -158,7 +158,6 @@ const Game = () => {
             drawOperation={drawOperation}
             color={pickColor(playerName)}
             disabled={game.nextPlayer && game.nextPlayer.id !== playerId}
-            nextPlayer={game.nextPlayer}
             redrawTimestamp={game.redrawTimestamp}
             distraction={Boolean(
               game.distractPlayers.find((player) => player.id === playerId)
