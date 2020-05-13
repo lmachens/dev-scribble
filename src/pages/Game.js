@@ -31,6 +31,7 @@ const Game = () => {
   const [secret, setSecret] = useState("");
   const [guessings, setGuessings] = useState([]);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [oldDrawOperations, setOldDrawOperations] = useState(null);
 
   const round = game ? game.round : 1;
   useEffect(() => {
@@ -41,8 +42,6 @@ const Game = () => {
     if (!playerName || !socket) {
       return;
     }
-
-    socket.emit("join game", { gameId, playerName });
 
     function handleDrawOperation(drawOperation) {
       setDrawOperation(drawOperation);
@@ -64,11 +63,18 @@ const Game = () => {
       setTimeLeft(timeLeft);
     }
 
+    function handleOldDrawOperations(oldDrawOperations) {
+      setOldDrawOperations(oldDrawOperations);
+    }
+
     socket.on("draw operation", handleDrawOperation);
     socket.on("refresh game", handleRefreshGame);
     socket.on("get secret", handleGetSecret);
     socket.on("guess word", handleGuessWord);
     socket.on("time left", handleTimeLeft);
+    socket.on("old draw operations", handleOldDrawOperations);
+
+    socket.emit("join game", { gameId, playerName });
 
     return () => {
       socket.off(handleDrawOperation);
@@ -76,6 +82,8 @@ const Game = () => {
       socket.off(handleGetSecret);
       socket.off(handleGuessWord);
       socket.off(handleTimeLeft);
+      socket.off(handleOldDrawOperations);
+
       socket.emit("leave game", gameId);
     };
   }, [playerName, gameId, socket]);
@@ -146,7 +154,7 @@ const Game = () => {
         <Border>
           <Canvas
             onChange={handleCanvasChange}
-            oldDrawOperations={game.drawOperations}
+            oldDrawOperations={oldDrawOperations}
             drawOperation={drawOperation}
             color={pickColor(playerName)}
             disabled={game.nextPlayer && game.nextPlayer.id !== playerId}
