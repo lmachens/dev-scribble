@@ -16,6 +16,10 @@ const Action = styled(Button)`
   padding: 4px 8px;
   border: none;
   border-left: 1px solid #2f363d;
+
+  :disabled {
+    border-color: inherit;
+  }
 `;
 
 function GameActions({ game, isDrawing }) {
