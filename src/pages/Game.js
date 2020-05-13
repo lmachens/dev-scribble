@@ -35,7 +35,7 @@ const Game = () => {
   const round = game ? game.round : 1;
   useEffect(() => {
     setGuessings([]);
-  }, [round, setGuessings]);
+  }, [round]);
 
   useEffect(() => {
     if (!playerName || !socket) {

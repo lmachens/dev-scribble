@@ -26,12 +26,7 @@ function GameStatus({
     <Container>
       {game.isRunning && (
         <Round>
-          Round {game.round}:{" "}
-          <span>
-            {game.oldSecret
-              ? `${game.nextPlayer.name.toUpperCase()} is next`
-              : `${timeLeft}s`}
-          </span>
+          Round {game.round}: <span>{timeLeft}s</span>
         </Round>
       )}
       {correctAnswer && visibleSecret}
