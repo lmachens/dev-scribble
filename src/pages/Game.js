@@ -141,7 +141,7 @@ const Game = () => {
       <MaxWidthContainer>
         <GameActions
           game={game}
-          canClear={!game.nextPlayer || game.nextPlayer.id === playerId}
+          isDrawing={!game.nextPlayer || game.nextPlayer.id === playerId}
         />
         <Border>
           <Canvas
@@ -152,6 +152,9 @@ const Game = () => {
             disabled={game.nextPlayer && game.nextPlayer.id !== playerId}
             nextPlayer={game.nextPlayer}
             redrawTimestamp={game.redrawTimestamp}
+            distraction={Boolean(
+              game.distractPlayers.find((player) => player.id === playerId)
+            )}
           />
         </Border>
       </MaxWidthContainer>

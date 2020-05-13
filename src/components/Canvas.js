@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import styled from "@emotion/styled";
+import { distractAnimation } from "./styles";
 
 const SmartCanvas = styled.canvas`
   max-width: 100%;
+  ${(props) => (props.distraction ? distractAnimation : "")};
 `;
 
 function calcDrawPosition(event, canvas) {
@@ -20,6 +22,7 @@ function Canvas({
   disabled,
   nextPlayer,
   redrawTimestamp,
+  distraction,
 }) {
   const canvasRef = useRef();
   const [previous, setPrevious] = useState(null);
@@ -129,6 +132,7 @@ function Canvas({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchMove={drawing ? handleTouchMove : undefined}
+      distraction={distraction}
     />
   );
 }
