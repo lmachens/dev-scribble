@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Canvas from "../components/Canvas";
-import SocketIO from "socket.io-client";
 import { useParams } from "react-router-dom";
 import { usePlayerName } from "../contexts/playerName";
 import SelectPlayerName from "../components/SelectPlayerName";
@@ -9,10 +8,11 @@ import Players from "../components/Players";
 import { pickColor } from "../utils/colors";
 import GameActions from "../components/GameActions";
 import PlayerStatus from "../components/PlayerStatus";
+import { useSocket } from "../contexts/socket";
 
 const Game = () => {
   const { gameId } = useParams();
-  const socketRef = useRef(null);
+  const socket = useSocket();
   const [drawOperation, setDrawOperation] = useState(null);
   const [game, setGame] = useState(null);
   const [playerName] = usePlayerName();
@@ -26,12 +26,11 @@ const Game = () => {
   }, [round, setGuessings]);
 
   useEffect(() => {
-    if (!playerName) {
+    if (!playerName || !socket) {
       return;
     }
 
-    socketRef.current = SocketIO();
-    socketRef.current.emit("join game", { gameId, playerName });
+    socket.emit("join game", { gameId, playerName });
 
     function handleDrawOperation(drawOperation) {
       setDrawOperation(drawOperation);
@@ -53,49 +52,49 @@ const Game = () => {
       setTimeLeft(timeLeft);
     }
 
-    socketRef.current.on("draw operation", handleDrawOperation);
-    socketRef.current.on("refresh game", handleRefreshGame);
-    socketRef.current.on("get secret", handleGetSecret);
-    socketRef.current.on("guess word", handleGuessWord);
-    socketRef.current.on("time left", handleTimeLeft);
+    socket.on("draw operation", handleDrawOperation);
+    socket.on("refresh game", handleRefreshGame);
+    socket.on("get secret", handleGetSecret);
+    socket.on("guess word", handleGuessWord);
+    socket.on("time left", handleTimeLeft);
 
     return () => {
-      socketRef.current.off(handleDrawOperation);
-      socketRef.current.off(handleRefreshGame);
-      socketRef.current.off(handleGetSecret);
-      socketRef.current.off(handleGuessWord);
-      socketRef.current.off(handleTimeLeft);
-      socketRef.current.emit("leave game", gameId);
+      socket.off(handleDrawOperation);
+      socket.off(handleRefreshGame);
+      socket.off(handleGetSecret);
+      socket.off(handleGuessWord);
+      socket.off(handleTimeLeft);
+      socket.emit("leave game", gameId);
     };
-  }, [playerName, gameId]);
+  }, [playerName, gameId, socket]);
 
   const handleCanvasChange = useCallback(
     (drawOperation) => {
-      socketRef.current.emit("draw operation", {
+      socket.emit("draw operation", {
         ...drawOperation,
         gameId,
       });
     },
-    [gameId]
+    [gameId, socket]
   );
 
   const handleStartGameClick = useCallback(() => {
-    socketRef.current.emit("start game", gameId);
-  }, [gameId]);
+    socket.emit("start game", gameId);
+  }, [gameId, socket]);
 
   const handleGuessSubmit = useCallback(
     (guess) => {
-      socketRef.current.emit("guess word", {
+      socket.emit("guess word", {
         guess,
         gameId,
       });
     },
-    [gameId]
+    [gameId, socket]
   );
 
   const handleClear = useCallback(() => {
-    socketRef.current.emit("clear canvas", gameId);
-  }, [gameId]);
+    socket.emit("clear canvas", gameId);
+  }, [gameId, socket]);
 
   if (!playerName) {
     return <SelectPlayerName />;
@@ -105,7 +104,7 @@ const Game = () => {
     return <div>Connecting...</div>;
   }
 
-  const playerId = socketRef.current.id;
+  const playerId = socket.id;
   return (
     <div>
       <Players>

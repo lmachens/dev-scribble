@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-import SocketIO from "socket.io-client";
+import React, { useState, useEffect } from "react";
 import { usePlayerName } from "../contexts/playerName";
 import SelectPlayerName from "../components/SelectPlayerName";
 import PlayerName from "../components/PlayerName";
@@ -7,6 +6,7 @@ import { ButtonLink } from "../components/Button";
 import List from "../components/List";
 import styled from "@emotion/styled";
 import GameListItem from "../components/GameListItem";
+import { useSocket } from "../contexts/socket";
 
 const Container = styled.div`
   padding: 10px;
@@ -14,27 +14,26 @@ const Container = styled.div`
 `;
 
 function Games() {
-  const socketRef = useRef(null);
+  const socket = useSocket();
   const [games, setGames] = useState([]);
   const [playerName] = usePlayerName();
 
   useEffect(() => {
-    if (!playerName) {
+    if (!playerName || !socket) {
       return;
     }
 
-    socketRef.current = SocketIO();
     function handleListGames(games) {
       setGames(games);
     }
 
-    socketRef.current.on("list games", handleListGames);
-    socketRef.current.emit("list games");
+    socket.on("list games", handleListGames);
+    socket.emit("list games");
 
     return () => {
-      socketRef.current.off(handleListGames);
+      socket.off(handleListGames);
     };
-  }, [playerName]);
+  }, [playerName, socket]);
 
   if (!playerName) {
     return <SelectPlayerName />;
@@ -46,9 +45,7 @@ function Games() {
         Hello, <PlayerName>{playerName}</PlayerName>,<br />
         join or open a game.
       </p>
-      <ButtonLink href={`/games/${socketRef.current?.id}`}>
-        Open Game
-      </ButtonLink>
+      <ButtonLink href={`/games/${socket?.id}`}>Open Game</ButtonLink>
       <h2>Open Games</h2>
       <List>
         {games.length === 0 && <div>No games found</div>}
