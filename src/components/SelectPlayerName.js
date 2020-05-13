@@ -54,7 +54,7 @@ function SelectPlayerName({ onSubmit }) {
   const [tempPlayerName, setTempPlayerName] = useState(playerName);
 
   function handlePlayerNameChange(event) {
-    const newPlayerName = event.target.value.trim();
+    const newPlayerName = event.target.value.trim().toUpperCase();
     if (newPlayerName.length > 9) {
       return;
     }
