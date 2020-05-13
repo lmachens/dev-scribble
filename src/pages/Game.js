@@ -9,6 +9,18 @@ import { pickColor } from "../utils/colors";
 import GameStatus from "../components/GameStatus";
 import PlayerStatus from "../components/PlayerStatus";
 import { useSocket } from "../contexts/socket";
+import GameActions from "../components/GameActions";
+import styled from "@emotion/styled";
+
+const MaxWidthContainer = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const Border = styled.div`
+  border: 1px solid #2f363d;
+  overflow: hidden;
+`;
 
 const Game = () => {
   const { gameId } = useParams();
@@ -92,10 +104,6 @@ const Game = () => {
     [gameId, socket]
   );
 
-  const handleClear = useCallback(() => {
-    socket.emit("clear canvas", gameId);
-  }, [gameId, socket]);
-
   if (!playerName) {
     return <SelectPlayerName />;
   }
@@ -130,16 +138,23 @@ const Game = () => {
         timeLeft={timeLeft}
         secretHints={game.secretHints}
       />
-      <Canvas
-        onChange={handleCanvasChange}
-        oldDrawOperations={game.drawOperations}
-        drawOperation={drawOperation}
-        color={pickColor(playerName)}
-        disabled={game.nextPlayer && game.nextPlayer.id !== playerId}
-        nextPlayer={game.nextPlayer}
-        onClear={handleClear}
-        redrawTimestamp={game.redrawTimestamp}
-      />
+      <MaxWidthContainer>
+        <GameActions
+          game={game}
+          canClear={!game.nextPlayer || game.nextPlayer.id === playerId}
+        />
+        <Border>
+          <Canvas
+            onChange={handleCanvasChange}
+            oldDrawOperations={game.drawOperations}
+            drawOperation={drawOperation}
+            color={pickColor(playerName)}
+            disabled={game.nextPlayer && game.nextPlayer.id !== playerId}
+            nextPlayer={game.nextPlayer}
+            redrawTimestamp={game.redrawTimestamp}
+          />
+        </Border>
+      </MaxWidthContainer>
       <div>
         <Button
           onClick={handleStartGameClick}

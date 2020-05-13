@@ -1,33 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import styled from "@emotion/styled";
-import Button from "./Button";
-
-const Container = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-`;
-
-const Border = styled.div`
-  border: 1px solid #2f363d;
-  overflow: hidden;
-`;
 
 const SmartCanvas = styled.canvas`
   max-width: 100%;
-`;
-
-const Actions = styled.div`
-  display: flex;
-  border: 1px solid #2f363d;
-  border-bottom: none;
-  justify-content: flex-end;
-`;
-
-const CanvasAction = styled(Button)`
-  font-size: 0.8rem;
-  padding: 4px 8px;
-  border: none;
-  border-left: 1px solid #2f363d;
 `;
 
 function calcDrawPosition(event, canvas) {
@@ -44,7 +19,6 @@ function Canvas({
   color,
   disabled,
   nextPlayer,
-  onClear,
   redrawTimestamp,
 }) {
   const canvasRef = useRef();
@@ -145,26 +119,17 @@ function Canvas({
   );
 
   return (
-    <Container>
-      <Actions>
-        <CanvasAction onClick={onClear} disabled={disabled}>
-          Clear
-        </CanvasAction>
-      </Actions>
-      <Border>
-        <SmartCanvas
-          ref={canvasRef}
-          width="800"
-          height="600"
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseMove={drawing ? handleMouseMove : undefined}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          onTouchMove={drawing ? handleTouchMove : undefined}
-        />
-      </Border>
-    </Container>
+    <SmartCanvas
+      ref={canvasRef}
+      width="800"
+      height="600"
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseMove={drawing ? handleMouseMove : undefined}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={drawing ? handleTouchMove : undefined}
+    />
   );
 }
 
