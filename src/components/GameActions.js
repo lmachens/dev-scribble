@@ -22,6 +22,10 @@ const Action = styled(Button)`
   }
 `;
 
+const Grow = styled.div`
+  flex-grow: 1;
+`;
+
 function GameActions({ game, isDrawing }) {
   const socket = useSocket();
 
@@ -35,6 +39,7 @@ function GameActions({ game, isDrawing }) {
 
   return (
     <Container>
+      <Grow />
       <Action
         onClick={handleDistractClick}
         disabled={isDrawing || !game.distractPossible}
