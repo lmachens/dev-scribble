@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import styled from "@emotion/styled";
 import { distractAnimation } from "./styles";
+import { sizes } from "./BrushSize";
 
 const SmartCanvas = styled.canvas`
   max-width: 100%;
@@ -22,6 +23,7 @@ function Canvas({
   disabled,
   redrawTimestamp,
   distraction,
+  brushSize,
 }) {
   const canvasRef = useRef();
   const [previous, setPrevious] = useState(null);
@@ -32,7 +34,7 @@ function Canvas({
     const ctx = canvasRef.current.getContext("2d");
 
     ctx.strokeStyle = drawOperation.color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = sizes[drawOperation.brushSize];
     ctx.lineCap = "round";
 
     ctx.beginPath();
@@ -61,10 +63,11 @@ function Canvas({
       previous,
       current,
       color,
+      brushSize: brushSize,
     };
     paint(drawOperation);
     onChange(drawOperation);
-  }, [onChange, drawing, previous, current, color, disabled, paint]);
+  }, [onChange, drawing, previous, current, color, disabled, paint, brushSize]);
 
   useEffect(() => {
     if (!drawOperation) {

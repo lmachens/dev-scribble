@@ -1,8 +1,9 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import Button from "./Button";
 import styled from "@emotion/styled";
 import { useSocket } from "../contexts/socket";
 import DangerIcon from "./DangerIcon";
+import BrushSize, { sizes } from "./BrushSize";
 
 const Container = styled.div`
   display: flex;
@@ -16,7 +17,7 @@ const Action = styled(Button)`
   padding: 4px 8px;
   border: none;
   border-left: 1px solid #2f363d;
-
+  background: ${(props) => (props.active ? "#2f363d" : "inherit")};
   :disabled {
     border-color: inherit;
   }
@@ -26,7 +27,7 @@ const Grow = styled.div`
   flex-grow: 1;
 `;
 
-function GameActions({ game, isDrawing }) {
+function GameActions({ game, isDrawing, brushSize, onBrushSize }) {
   const socket = useSocket();
 
   const handleClearClick = useCallback(() => {
@@ -39,6 +40,16 @@ function GameActions({ game, isDrawing }) {
 
   return (
     <Container>
+      {Object.keys(sizes).map((size) => (
+        <Action
+          key={size}
+          active={brushSize === size}
+          onClick={() => onBrushSize(size)}
+        >
+          <BrushSize size={size} />
+        </Action>
+      ))}
+
       <Grow />
       <Action
         onClick={handleDistractClick}

@@ -32,6 +32,7 @@ const Game = () => {
   const [guessings, setGuessings] = useState([]);
   const [timeLeft, setTimeLeft] = useState(0);
   const [oldDrawOperations, setOldDrawOperations] = useState(null);
+  const [brushSize, setBrushSize] = useState("M");
 
   const round = game ? game.round : 1;
   useEffect(() => {
@@ -150,9 +151,12 @@ const Game = () => {
         <GameActions
           game={game}
           isDrawing={!game.nextPlayer || game.nextPlayer.id === playerId}
+          brushSize={brushSize}
+          onBrushSize={setBrushSize}
         />
         <Border>
           <Canvas
+            brushSize={brushSize}
             onChange={handleCanvasChange}
             oldDrawOperations={oldDrawOperations}
             drawOperation={drawOperation}
