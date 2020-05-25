@@ -33,6 +33,7 @@ const Game = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [oldDrawOperations, setOldDrawOperations] = useState(null);
   const [brushSize, setBrushSize] = useState("M");
+  const [color, setColor] = useState(pickColor(playerName));
 
   const round = game ? game.round : 1;
   useEffect(() => {
@@ -152,7 +153,9 @@ const Game = () => {
           game={game}
           isDrawing={!game.nextPlayer || game.nextPlayer.id === playerId}
           brushSize={brushSize}
-          onBrushSize={setBrushSize}
+          onBrushSizeChange={setBrushSize}
+          color={color}
+          onColorChange={setColor}
         />
         <Border>
           <Canvas
@@ -160,7 +163,7 @@ const Game = () => {
             onChange={handleCanvasChange}
             oldDrawOperations={oldDrawOperations}
             drawOperation={drawOperation}
-            color={pickColor(playerName)}
+            color={color}
             disabled={game.nextPlayer && game.nextPlayer.id !== playerId}
             redrawTimestamp={game.redrawTimestamp}
             distraction={Boolean(
