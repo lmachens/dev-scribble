@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import Button from "./Button";
 import styled from "@emotion/styled";
 import { useSocket } from "../contexts/socket";
@@ -27,7 +27,29 @@ const Grow = styled.div`
   flex-grow: 1;
 `;
 
-function GameActions({ game, isDrawing, brushSize, onBrushSize }) {
+const ColorInput = styled.input`
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  border-color: ${(props) => props.value};
+  margin: 3px;
+
+  ::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+`;
+
+function GameActions({
+  game,
+  isDrawing,
+  brushSize,
+  onBrushSizeChange,
+  color,
+  onColorChange,
+}) {
   const socket = useSocket();
 
   const handleClearClick = useCallback(() => {
@@ -40,11 +62,16 @@ function GameActions({ game, isDrawing, brushSize, onBrushSize }) {
 
   return (
     <Container>
+      <ColorInput
+        type="color"
+        value={color}
+        onChange={(event) => onColorChange(event.target.value)}
+      />
       {Object.keys(sizes).map((size) => (
         <Action
           key={size}
           active={brushSize === size}
-          onClick={() => onBrushSize(size)}
+          onClick={() => onBrushSizeChange(size)}
         >
           <BrushSize size={size} />
         </Action>
