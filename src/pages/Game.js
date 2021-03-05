@@ -11,6 +11,7 @@ import PlayerStatus from "../components/PlayerStatus";
 import { useSocket } from "../contexts/socket";
 import GameActions from "../components/GameActions";
 import styled from "@emotion/styled";
+import Select from "../components/Select";
 
 const MaxWidthContainer = styled.div`
   max-width: 800px;
@@ -34,6 +35,7 @@ const Game = () => {
   const [oldDrawOperations, setOldDrawOperations] = useState(null);
   const [brushSize, setBrushSize] = useState("M");
   const [color, setColor] = useState(pickColor(playerName));
+  const [categoryName, setCategoryName] = useState("English");
 
   const round = game ? game.round : 1;
   useEffect(() => {
@@ -76,7 +78,10 @@ const Game = () => {
     socket.on("time left", handleTimeLeft);
     socket.on("old draw operations", handleOldDrawOperations);
 
-    socket.emit("join game", { gameId, playerName, categoryName: "English" });
+    socket.emit("join game", {
+      gameId,
+      playerName,
+    });
 
     return () => {
       socket.off(handleDrawOperation);
@@ -101,8 +106,8 @@ const Game = () => {
   );
 
   const handleStartGameClick = useCallback(() => {
-    socket.emit("start game", gameId);
-  }, [gameId, socket]);
+    socket.emit("start game", { gameId, categoryName });
+  }, [gameId, socket, categoryName]);
 
   const handleGuessSubmit = useCallback(
     (guess) => {
@@ -123,6 +128,9 @@ const Game = () => {
   }
 
   const playerId = socket.id;
+  const isNotEditable =
+    game.owner.id !== playerId || game.isRunning || game.players.length <= 1;
+
   return (
     <div>
       <Players>
@@ -173,14 +181,15 @@ const Game = () => {
         </Border>
       </MaxWidthContainer>
       <div>
-        <Button
-          onClick={handleStartGameClick}
-          disabled={
-            game.owner.id !== playerId ||
-            game.isRunning ||
-            game.players.length <= 1
-          }
+        <Select
+          onChange={(event) => setCategoryName(event.target.value)}
+          value={categoryName}
+          disabled={isNotEditable}
         >
+          <option value="Deutsch">Deutsch</option>
+          <option value="English">English</option>
+        </Select>
+        <Button onClick={handleStartGameClick} disabled={isNotEditable}>
           Start game
         </Button>
         <ButtonLink href="/games">Exit game</ButtonLink>
