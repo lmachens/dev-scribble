@@ -76,7 +76,7 @@ const Game = () => {
     socket.on("time left", handleTimeLeft);
     socket.on("old draw operations", handleOldDrawOperations);
 
-    socket.emit("join game", { gameId, playerName });
+    socket.emit("join game", { gameId, playerName, categoryName: "English" });
 
     return () => {
       socket.off(handleDrawOperation);
