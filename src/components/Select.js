@@ -11,6 +11,11 @@ const Select = styled.select`
   option {
     background: #000;
   }
+
+  :disabled {
+    color: #2f363d;
+    border-color: transparent;
+  }
 `;
 
 export default Select;
