@@ -35,7 +35,8 @@ const Game = () => {
   const [oldDrawOperations, setOldDrawOperations] = useState(null);
   const [brushSize, setBrushSize] = useState("M");
   const [color, setColor] = useState(pickColor(playerName));
-  const [categoryName, setCategoryName] = useState("English");
+  const [categoryName, setCategoryName] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   const round = game ? game.round : 1;
   useEffect(() => {
@@ -71,12 +72,19 @@ const Game = () => {
       setOldDrawOperations(oldDrawOperations);
     }
 
+    function handleCategories(categories) {
+      console.log({ categories });
+      setCategories(categories);
+      setCategoryName(categories[0]);
+    }
+
     socket.on("draw operation", handleDrawOperation);
     socket.on("refresh game", handleRefreshGame);
     socket.on("get secret", handleGetSecret);
     socket.on("guess word", handleGuessWord);
     socket.on("time left", handleTimeLeft);
     socket.on("old draw operations", handleOldDrawOperations);
+    socket.on("categories", handleCategories);
 
     socket.emit("join game", {
       gameId,
@@ -90,6 +98,7 @@ const Game = () => {
       socket.off(handleGuessWord);
       socket.off(handleTimeLeft);
       socket.off(handleOldDrawOperations);
+      socket.off(handleCategories);
 
       socket.emit("leave game", gameId);
     };
@@ -186,8 +195,11 @@ const Game = () => {
           value={categoryName}
           disabled={isNotEditable}
         >
-          <option value="Deutsch">Deutsch</option>
-          <option value="English">English</option>
+          {categories.map((category) => (
+            <option key={category.name} value={category.name}>
+              {category.name}
+            </option>
+          ))}
         </Select>
         <Button onClick={handleStartGameClick} disabled={isNotEditable}>
           Start game
