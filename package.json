@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^7.2.1",
     "express": "^4.17.1",
     "http-proxy-middleware": "^1.0.3",
+    "mongodb": "^3.6.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",

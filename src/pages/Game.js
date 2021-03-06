@@ -11,6 +11,7 @@ import PlayerStatus from "../components/PlayerStatus";
 import { useSocket } from "../contexts/socket";
 import GameActions from "../components/GameActions";
 import styled from "@emotion/styled";
+import Select from "../components/Select";
 
 const MaxWidthContainer = styled.div`
   max-width: 800px;
@@ -34,6 +35,8 @@ const Game = () => {
   const [oldDrawOperations, setOldDrawOperations] = useState(null);
   const [brushSize, setBrushSize] = useState("M");
   const [color, setColor] = useState(pickColor(playerName));
+  const [categoryName, setCategoryName] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   const round = game ? game.round : 1;
   useEffect(() => {
@@ -69,14 +72,24 @@ const Game = () => {
       setOldDrawOperations(oldDrawOperations);
     }
 
+    function handleCategories(categories) {
+      console.log({ categories });
+      setCategories(categories);
+      setCategoryName(categories[0]);
+    }
+
     socket.on("draw operation", handleDrawOperation);
     socket.on("refresh game", handleRefreshGame);
     socket.on("get secret", handleGetSecret);
     socket.on("guess word", handleGuessWord);
     socket.on("time left", handleTimeLeft);
     socket.on("old draw operations", handleOldDrawOperations);
+    socket.on("categories", handleCategories);
 
-    socket.emit("join game", { gameId, playerName });
+    socket.emit("join game", {
+      gameId,
+      playerName,
+    });
 
     return () => {
       socket.off(handleDrawOperation);
@@ -85,6 +98,7 @@ const Game = () => {
       socket.off(handleGuessWord);
       socket.off(handleTimeLeft);
       socket.off(handleOldDrawOperations);
+      socket.off(handleCategories);
 
       socket.emit("leave game", gameId);
     };
@@ -101,8 +115,8 @@ const Game = () => {
   );
 
   const handleStartGameClick = useCallback(() => {
-    socket.emit("start game", gameId);
-  }, [gameId, socket]);
+    socket.emit("start game", { gameId, categoryName });
+  }, [gameId, socket, categoryName]);
 
   const handleGuessSubmit = useCallback(
     (guess) => {
@@ -123,6 +137,9 @@ const Game = () => {
   }
 
   const playerId = socket.id;
+  const isNotEditable =
+    game.owner.id !== playerId || game.isRunning || game.players.length <= 1;
+
   return (
     <div>
       <Players>
@@ -173,14 +190,18 @@ const Game = () => {
         </Border>
       </MaxWidthContainer>
       <div>
-        <Button
-          onClick={handleStartGameClick}
-          disabled={
-            game.owner.id !== playerId ||
-            game.isRunning ||
-            game.players.length <= 1
-          }
+        <Select
+          onChange={(event) => setCategoryName(event.target.value)}
+          value={categoryName}
+          disabled={isNotEditable}
         >
+          {categories.map((category) => (
+            <option key={category.name} value={category.name}>
+              {category.name}
+            </option>
+          ))}
+        </Select>
+        <Button onClick={handleStartGameClick} disabled={isNotEditable}>
           Start game
         </Button>
         <ButtonLink href="/games">Exit game</ButtonLink>
