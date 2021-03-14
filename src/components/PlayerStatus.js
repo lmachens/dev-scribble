@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled";
 import PlayerName from "./PlayerName";
-import { css } from "@emotion/core";
+import { css } from "@emotion/react";
 import { scrollBackground, fadeAnimation, fadeOutAnimation } from "./styles";
 
 function getStatusStyles({ isNextPlayer, correctAnswer }) {
