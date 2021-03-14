@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { Link } from "react-router-dom";
 
 const Button = styled.button`
   display: inline-block;
@@ -23,5 +24,9 @@ const Button = styled.button`
   }
 `;
 
-export const ButtonLink = Button.withComponent("a");
+export const ButtonLink = ({ href, ...rest }) => (
+  <Link to={href}>
+    <Button {...rest} />
+  </Link>
+);
 export default Button;
