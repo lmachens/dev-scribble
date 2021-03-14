@@ -8,8 +8,12 @@ const MaxCanvas = styled.canvas`
 
 function calcDrawPosition(event, canvas) {
   return [
-    ((event.pageX - canvas.offsetLeft) * canvas.width) / canvas.offsetWidth,
-    ((event.pageY - canvas.offsetTop) * canvas.height) / canvas.offsetHeight,
+    ((event.pageX - canvas.parentElement.offsetLeft) * canvas.width) /
+      canvas.parentElement.offsetWidth +
+      1,
+    ((event.pageY - canvas.parentElement.offsetTop) * canvas.height) /
+      canvas.parentElement.offsetHeight +
+      1,
   ];
 }
 
@@ -40,6 +44,60 @@ function Canvas({
     ctx.stroke();
     ctx.closePath();
   }, []);
+
+  const handleMouseUp = useCallback(() => {
+    setDrawing(false);
+    setCurrent(null);
+    setPrevious(null);
+  }, []);
+
+  const handleMouseMove = useCallback(
+    (event) => {
+      if (!drawing) {
+        return;
+      }
+      const drawPosition = calcDrawPosition(event, canvasRef.current);
+      setPrevious(current);
+      setCurrent(drawPosition);
+    },
+    [drawing, current]
+  );
+
+  const handleTouchEnd = useCallback(
+    (event) => {
+      handleMouseUp();
+    },
+    [handleMouseUp]
+  );
+
+  const handleTouchMove = useCallback(
+    (event) => {
+      if (!drawing) {
+        return;
+      }
+      const touch = event.touches[0];
+      const mouseEvent = new MouseEvent("mousemove", {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      handleMouseMove(mouseEvent);
+    },
+    [drawing, handleMouseMove]
+  );
+
+  useEffect(() => {
+    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchEnd", handleTouchEnd);
+    window.addEventListener("touchMove", handleTouchMove);
+
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchEnd", handleTouchEnd);
+      window.removeEventListener("touchMove", handleTouchMove);
+    };
+  }, [handleMouseUp, handleMouseMove, handleTouchEnd, handleTouchMove]);
 
   useEffect(() => {
     const ctx = canvasRef.current.getContext("2d");
@@ -74,23 +132,10 @@ function Canvas({
   }, [drawOperation, paint]);
 
   const handleMouseDown = useCallback((event) => {
-    setCurrent(calcDrawPosition(event, canvasRef.current));
+    const drawPosition = calcDrawPosition(event, canvasRef.current);
+    setCurrent(drawPosition);
     setDrawing(true);
   }, []);
-
-  const handleMouseUp = useCallback(() => {
-    setDrawing(false);
-    setCurrent(null);
-    setPrevious(null);
-  }, []);
-
-  const handleMouseMove = useCallback(
-    (event) => {
-      setPrevious(current);
-      setCurrent(calcDrawPosition(event, canvasRef.current));
-    },
-    [current]
-  );
 
   const handleTouchStart = useCallback(
     (event) => {
@@ -104,36 +149,13 @@ function Canvas({
     [handleMouseDown]
   );
 
-  const handleTouchEnd = useCallback(
-    (event) => {
-      handleMouseUp();
-    },
-    [handleMouseUp]
-  );
-
-  const handleTouchMove = useCallback(
-    (event) => {
-      const touch = event.touches[0];
-      const mouseEvent = new MouseEvent("mousemove", {
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-      });
-      handleMouseMove(mouseEvent);
-    },
-    [handleMouseMove]
-  );
-
   return (
     <MaxCanvas
       ref={canvasRef}
       width="800"
       height="600"
       onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={drawing ? handleMouseMove : undefined}
       onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchMove={drawing ? handleTouchMove : undefined}
     />
   );
 }

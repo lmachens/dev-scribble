@@ -32,7 +32,6 @@ function Distraction() {
       .then(setAnimationData);
   }, []);
 
-  console.log(animationData);
   if (!animationData) {
     return null;
   }

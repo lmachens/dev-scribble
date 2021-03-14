@@ -15,6 +15,7 @@ function GlobalStyles() {
 
         html {
           font-size: 16px;
+          user-select: none;
         }
 
         body {

@@ -23,6 +23,7 @@ const Border = styled.div`
   position: relative;
   border: 1px solid #2f363d;
   overflow: hidden;
+  display: flex;
 `;
 
 const Game = () => {
