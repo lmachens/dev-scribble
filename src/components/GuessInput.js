@@ -53,6 +53,7 @@ function GuessInput({ onSubmit, secretLength, round, secretHints }) {
     <Container>
       <HiddenInput
         value={guess}
+        onChange={() => {}}
         autoFocus
         autoCorrect="off"
         autoComplete="off"

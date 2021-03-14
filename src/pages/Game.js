@@ -12,6 +12,7 @@ import { useSocket } from "../contexts/socket";
 import GameActions from "../components/GameActions";
 import styled from "@emotion/styled";
 import Select from "../components/Select";
+import Distraction from "../components/Distraction";
 
 const MaxWidthContainer = styled.div`
   max-width: 800px;
@@ -19,6 +20,7 @@ const MaxWidthContainer = styled.div`
 `;
 
 const Border = styled.div`
+  position: relative;
   border: 1px solid #2f363d;
   overflow: hidden;
 `;
@@ -137,6 +139,9 @@ const Game = () => {
   const playerId = socket.id;
   const isNotEditable =
     game.owner.id !== playerId || game.isRunning || game.players.length <= 1;
+  const showDistraction = Boolean(
+    game.distractPlayers.find((player) => player.id === playerId)
+  );
 
   return (
     <div>
@@ -181,10 +186,8 @@ const Game = () => {
             color={color}
             disabled={game.nextPlayer && game.nextPlayer.id !== playerId}
             redrawTimestamp={game.redrawTimestamp}
-            distraction={Boolean(
-              game.distractPlayers.find((player) => player.id === playerId)
-            )}
           />
+          {showDistraction && <Distraction />}
         </Border>
       </MaxWidthContainer>
       <div>

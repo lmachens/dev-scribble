@@ -70,33 +70,3 @@ export const fadeOut = keyframes`
 export const fadeOutAnimation = css`
   animation: ${fadeOut} 2s ease;
 `;
-
-export const distract = keyframes`
-  from {
-    transform: none;
-  }
-
-  20% {
-    transform: rotate(45deg) scale(1.2);
-  }
-
-  40% {
-    transform: rotate(60deg) scale(1.4);
-  }
-
-  60% {
-    transform: rotate(-60deg) scale(0.6);
-  }
-
-  80% {
-    transform: rotate(-20deg) scale(0.7);
-  }
-
-  to {
-    transform: none;
-  }
-`;
-
-export const distractAnimation = css`
-  animation: ${distract} 4s ease 2;
-`;
