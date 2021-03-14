@@ -73,11 +73,9 @@ const Game = () => {
     }
 
     function handleCategories(categories) {
-      console.log({ categories });
       setCategories(categories);
-      setCategoryName(categories[0]);
+      setCategoryName(categories[0].name);
     }
-
     socket.on("draw operation", handleDrawOperation);
     socket.on("refresh game", handleRefreshGame);
     socket.on("get secret", handleGetSecret);

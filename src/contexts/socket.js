@@ -7,6 +7,7 @@ export function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
+    console.log("New socket");
     setSocket(SocketIO());
   }, []);
 
