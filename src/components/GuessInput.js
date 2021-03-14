@@ -30,12 +30,17 @@ function GuessInput({ onSubmit, secretLength, round, secretHints }) {
     if (!keyEvent) {
       return;
     }
-    if (keyEvent.key === "Backspace") {
+    if (keyEvent.key === "Enter") {
+      setGuess((guess) => {
+        onSubmit(guess);
+        return "";
+      });
+    } else if (keyEvent.key === "Backspace") {
       setGuess((guess) => guess.substring(0, guess.length - 1));
     } else if (keyEvent.key.length === 1) {
       setGuess((guess) => guess + keyEvent.key);
     }
-  }, [keyEvent]);
+  }, [keyEvent, onSubmit]);
 
   useEffect(() => {
     if (guess.length > 0 && guess.length === secretLength) {
@@ -44,16 +49,10 @@ function GuessInput({ onSubmit, secretLength, round, secretHints }) {
     }
   }, [guess, secretLength, onSubmit, setGuess]);
 
-  function handleInputChange(event) {
-    event.stopPropagation();
-    setGuess(event.target.value.trim());
-  }
-
   return (
     <Container>
       <HiddenInput
         value={guess}
-        onChange={handleInputChange}
         autoFocus
         autoCorrect="off"
         autoComplete="off"

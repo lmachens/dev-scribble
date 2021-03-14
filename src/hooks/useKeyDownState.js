@@ -5,6 +5,8 @@ function useKeyDownState() {
 
   useEffect(() => {
     function handleKeyDown(event) {
+      event.stopPropagation();
+      event.preventDefault();
       setKeyEvent({
         timestamp: Date.now(),
         key: event.key,
