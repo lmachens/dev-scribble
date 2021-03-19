@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const path = require("path");
 const { connect } = require("./lib/db");
+const { getGameById } = require("./lib/routes");
 const { listenSocket } = require("./lib/socket");
 
 const app = express();
@@ -11,6 +12,8 @@ const PORT = process.env.PORT || 8080;
 const MONGODB_URI =
   process.env.MONGODB_URI || "mongodb://localhost:27017/dev-scribble";
 listenSocket(server);
+
+app.get("/api/games/:gameId", getGameById);
 
 app.use(express.static(path.join(__dirname, "build")));
 
