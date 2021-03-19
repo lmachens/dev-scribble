@@ -6,6 +6,7 @@ import Games from "./pages/Games";
 import { PlayerNameProvider } from "./contexts/playerName";
 import FullMain from "./components/FullMain";
 import { SocketProvider } from "./contexts/socket";
+import PastGame from "./pages/PastGame";
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
         <PlayerNameProvider>
           <FullMain>
             <Switch>
+              <Route path="/past-games/:gameId">
+                <PastGame />
+              </Route>
               <Route path="/games/:gameId">
                 <Game />
               </Route>

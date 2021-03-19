@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Canvas from "../components/Canvas";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { usePlayerName } from "../contexts/playerName";
 import SelectPlayerName from "../components/SelectPlayerName";
 import Button, { ButtonLink } from "../components/Button";
@@ -13,6 +13,7 @@ import GameActions from "../components/GameActions";
 import styled from "@emotion/styled";
 import Select from "../components/Select";
 import Distraction from "../components/Distraction";
+import RoundSelect from "../components/RoundSelect";
 
 const MaxWidthContainer = styled.div`
   max-width: 800px;
@@ -27,6 +28,8 @@ const Border = styled.div`
 `;
 
 const Game = () => {
+  const history = useHistory();
+
   const { gameId } = useParams();
   const socket = useSocket();
   const [drawOperation, setDrawOperation] = useState(null);
@@ -40,6 +43,7 @@ const Game = () => {
   const [color, setColor] = useState(pickColor(playerName));
   const [categoryName, setCategoryName] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [maxRounds, setMaxRounds] = useState(3);
 
   const round = game ? game.round : 1;
   useEffect(() => {
@@ -79,6 +83,16 @@ const Game = () => {
       setCategories(categories);
       setCategoryName(categories[0].name);
     }
+
+    function handleGameSettingsChange({ maxRounds, categoryName }) {
+      setMaxRounds(maxRounds);
+      setCategoryName(categoryName);
+    }
+
+    function handleEndGame() {
+      history.push(`/past-games/${gameId}`);
+    }
+
     socket.on("draw operation", handleDrawOperation);
     socket.on("refresh game", handleRefreshGame);
     socket.on("get secret", handleGetSecret);
@@ -86,7 +100,8 @@ const Game = () => {
     socket.on("time left", handleTimeLeft);
     socket.on("old draw operations", handleOldDrawOperations);
     socket.on("categories", handleCategories);
-
+    socket.on("game settings change", handleGameSettingsChange);
+    socket.on("end game", handleEndGame);
     socket.emit("join game", {
       gameId,
       playerName,
@@ -100,10 +115,12 @@ const Game = () => {
       socket.off(handleTimeLeft);
       socket.off(handleOldDrawOperations);
       socket.off(handleCategories);
+      socket.off(handleGameSettingsChange);
+      socket.off(handleEndGame);
 
       socket.emit("leave game", gameId);
     };
-  }, [playerName, gameId, socket]);
+  }, [history, playerName, gameId, socket]);
 
   const handleCanvasChange = useCallback(
     (drawOperation) => {
@@ -116,8 +133,8 @@ const Game = () => {
   );
 
   const handleStartGameClick = useCallback(() => {
-    socket.emit("start game", { gameId, categoryName });
-  }, [gameId, socket, categoryName]);
+    socket.emit("start game", { categoryName, maxRounds });
+  }, [socket, categoryName, maxRounds]);
 
   const handleGuessSubmit = useCallback(
     (guess) => {
@@ -192,8 +209,23 @@ const Game = () => {
         </Border>
       </MaxWidthContainer>
       <div>
+        <RoundSelect
+          value={maxRounds}
+          onChange={(event) =>
+            socket.emit("game settings change", {
+              maxRounds: +event.target.value,
+              categoryName,
+            })
+          }
+          disabled={isNotEditable}
+        />
         <Select
-          onChange={(event) => setCategoryName(event.target.value)}
+          onChange={(event) =>
+            socket.emit("game settings change", {
+              maxRounds,
+              categoryName: event.target.value,
+            })
+          }
           value={categoryName}
           disabled={isNotEditable}
         >
